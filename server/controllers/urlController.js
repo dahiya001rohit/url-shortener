@@ -1,6 +1,7 @@
 import { nanoid } from "nanoid";
 import Url from "../models/Url.js";
 import redisClient from "../services/redis.js";
+import { analyticsQueue } from "../services/queue.js";
 
 export async function shortenUrl(req, res) {
   const { originalUrl, expiresAt } = req.body;
@@ -27,10 +28,16 @@ export async function redirectUrl(req, res) {
 
   const cached = await redisClient.get(`url:${shortCode}`);
   if (cached) {
-    const { originalUrl, expiresAt } = JSON.parse(cached);
+    const { urlId, originalUrl, expiresAt } = JSON.parse(cached);
     if (expiresAt && new Date(expiresAt) < new Date())
       return res.status(410).json({ message: "This link has expired" });
-    Url.updateOne({ shortCode }, { $inc: { clicks: 1 } }).exec();
+    analyticsQueue.add("click", {
+      urlId,
+      shortCode,
+      ip: req.ip,
+      userAgent: req.headers["user-agent"],
+      referrer: req.headers["referer"],
+    });
     return res.redirect(originalUrl);
   }
 
@@ -42,12 +49,19 @@ export async function redirectUrl(req, res) {
 
   await redisClient.set(
     `url:${shortCode}`,
-    JSON.stringify({ originalUrl: url.originalUrl, expiresAt: url.expiresAt }),
+    JSON.stringify({ urlId: url._id, originalUrl: url.originalUrl, expiresAt: url.expiresAt }),
     "EX",
     3600
   );
 
-  Url.updateOne({ shortCode }, { $inc: { clicks: 1 } }).exec();
+  analyticsQueue.add("click", {
+    urlId: url._id,
+    shortCode,
+    ip: req.ip,
+    userAgent: req.headers["user-agent"],
+    referrer: req.headers["referer"],
+  });
+
   res.redirect(url.originalUrl);
 }
 

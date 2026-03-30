@@ -1,4 +1,11 @@
-import { Queue } from "bullmq";
-import client from "./redis.js";
+import { Queue, Worker } from "bullmq";
+import Redis from "ioredis";
+import { processClick } from "./analytics.js";
 
-export const analyticsQueue = new Queue("analytics", { connection: client });
+const connection = new Redis(process.env.REDIS_URL, {
+  maxRetriesPerRequest: null,
+});
+
+export const analyticsQueue = new Queue("analytics", {connection});
+
+new Worker("analytics", processClick, {connection});
