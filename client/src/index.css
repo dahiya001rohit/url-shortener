@@ -1,13 +1,89 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #002F2D;
+  --primary-container: #0D4744;
+  --on-primary: #ffffff;
+  --on-primary-container: #81b4b0;
+  --accent: #FFB95F;
+  --on-accent: #2A1700;
+  --background: #FAF9F8;
+  --surface: #FAF9F8;
+  --surface-container-low: #F4F3F2;
+  --surface-container: #EEEEED;
+  --surface-container-high: #E9E8E7;
+  --surface-container-highest: #E3E2E1;
+  --surface-container-lowest: #ffffff;
+  --foreground: #1A1C1C;
+  --secondary: #5F5E5E;
+  --outline: #707978;
+  --outline-variant: #BFC8C7;
+  --error: #BA1A1A;
+  --on-error: #ffffff;
+  --font-headline: 'Noto Serif', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  --radius: 0.5rem;
+  --radius-full: 9999px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.editorial-grid {
+  background-image: radial-gradient(#bfc8c7 0.5px, transparent 0.5px);
+  background-size: 24px 24px;
 }
+
+.radial-spotlight {
+  background: radial-gradient(circle at center, rgba(0, 47, 45, 0.04) 0%, transparent 70%);
+}
+
+.nav-glass-base {
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+  -webkit-backdrop-filter: blur(40px) saturate(180%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow:
+    0 2px 0 0 rgba(255,255,255,0.3) inset,
+    0 -1px 0 0 rgba(0,0,47,0.08) inset,
+    0 8px 32px rgba(0, 47, 45, 0.10),
+    0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.nav-scrolled-state {
+  background: rgba(255, 255, 255, 0.35) !important;
+  backdrop-filter: blur(60px) saturate(180%) brightness(1.1) !important;
+  -webkit-backdrop-filter: blur(60px) saturate(180%) brightness(1.1) !important;
+  box-shadow:
+    0 2px 0 0 rgba(255,255,255,0.4) inset,
+    0 -1px 0 0 rgba(0,0,47,0.1) inset,
+    0 12px 48px rgba(0, 47, 45, 0.15),
+    0 4px 12px rgba(0, 0, 0, 0.08) !important;
+}
+
+.shimmer-pill {
+  background: linear-gradient(90deg, rgba(255,185,95,0.15) 0%, rgba(255,185,95,0.25) 50%, rgba(255,185,95,0.15) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite linear;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.mockup-3d {
+  transform: perspective(1000px) rotateX(8deg) rotateY(-2deg);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s ease;
+}
+
+.mockup-3d:hover {
+  transform: perspective(1000px) rotateX(4deg) rotateY(-1deg) scale(1.02);
+  box-shadow: 0 40px 80px -20px rgba(0, 47, 45, 0.15);
+}
+
+.btn-interact {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.btn-interact:hover { transform: scale(1.05); }
+.btn-interact:active { transform: scale(0.95); }
