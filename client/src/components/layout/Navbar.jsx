@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Link2 } from "lucide-react";
 
 const NAV_LINKS = [
@@ -10,6 +11,7 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -32,7 +34,7 @@ export function Navbar() {
         }}
       />
       <div className="relative flex items-center justify-between px-8 py-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
           <Link2 className="text-primary w-5 h-5" />
           <span className="text-2xl font-mono font-bold text-emerald-900">Snip</span>
         </div>
@@ -48,10 +50,16 @@ export function Navbar() {
           ))}
         </div>
         <div className="flex items-center gap-4">
-          <button className="hidden sm:block text-emerald-800/70 text-sm font-medium hover:text-emerald-600 transition-colors btn-interact">
+          <button
+            onClick={() => navigate("/login")}
+            className="hidden sm:block text-emerald-800/70 text-sm font-medium hover:text-emerald-600 transition-colors btn-interact"
+          >
             Sign In
           </button>
-          <button className="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium btn-interact">
+          <button
+            onClick={() => navigate("/register")}
+            className="bg-primary text-on-primary px-5 py-2 rounded-full text-sm font-medium btn-interact"
+          >
             Get Started
           </button>
         </div>
