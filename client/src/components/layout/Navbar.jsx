@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { label: "Pricing", href: "#" },
 ];
 
-export function Navbar() {
+export function Navbar({ onDashboard, onLogout }) {
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-6 left-0 right-0 mx-auto z-50 w-[80%] max-w-5xl rounded-full transition-all duration-500 nav-glass-base overflow-hidden ${
+      className={`fixed top-6 left-0 right-0 mx-auto z-50 w-[80%] max-w-7xl rounded-full transition-all duration-500 nav-glass-base overflow-hidden ${
         scrolled ? "nav-scrolled-state" : ""
       }`}
     >

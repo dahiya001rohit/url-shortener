@@ -3,6 +3,8 @@ import Navbar from "./components/layout/Navbar";
 import LandingPage from "./Pages/LandingPage";
 import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
+import DashboardPage from "./Pages/DashboardPage";
+import AnalyticsPage from "./Pages/AnalyticsPage";
 import "./index.css";
 
 function MainLayout({ children }) {
@@ -44,6 +46,22 @@ export default function App() {
             <AuthLayout>
               <RegisterPage />
             </AuthLayout>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <DashboardPage />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/analytics/:shortCode"
+          element={
+            <MainLayout>
+              <AnalyticsPage />
+            </MainLayout>
           }
         />
       </Routes>
