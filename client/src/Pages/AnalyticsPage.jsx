@@ -32,7 +32,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="max-w-6xl mx-auto px-8 pt-12 pb-24">
+      <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
         <AnalyticsHeader
           shortCode={shortCode}
           originalUrl={MOCK_LINK.originalUrl}

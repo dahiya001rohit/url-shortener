@@ -5,10 +5,23 @@ import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
 import DashboardPage from "./Pages/DashboardPage";
 import AnalyticsPage from "./Pages/AnalyticsPage";
+import HomePage from "./Pages/HomePage";
 import "./index.css";
 import Footer from "./components/layout/Footer";
 
+// Landing page — navbar + footer
 function MainLayout({ children }) {
+  return (
+    <>
+      <Navbar />
+      {children}
+      <Footer />
+    </>
+  );
+}
+
+// Internal app pages — navbar + footer
+function AppLayout({ children }) {
   return (
     <>
       <Navbar />
@@ -53,17 +66,25 @@ export default function App() {
         <Route
           path="/dashboard"
           element={
-            <MainLayout>
+            <AppLayout>
               <DashboardPage />
-            </MainLayout>
+            </AppLayout>
           }
         />
         <Route
           path="/analytics/:shortCode"
           element={
-            <MainLayout>
+            <AppLayout>
               <AnalyticsPage />
-            </MainLayout>
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <AppLayout>
+              <HomePage />
+            </AppLayout>
           }
         />
       </Routes>
