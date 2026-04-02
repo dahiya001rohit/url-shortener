@@ -6,6 +6,7 @@ import RegisterPage from "./Pages/RegisterPage";
 import DashboardPage from "./Pages/DashboardPage";
 import AnalyticsPage from "./Pages/AnalyticsPage";
 import HomePage from "./Pages/HomePage";
+import ProfilePage from "./Pages/ProfilePage";
 import "./index.css";
 import Footer from "./components/layout/Footer";
 
@@ -84,6 +85,14 @@ export default function App() {
           element={
             <AppLayout>
               <HomePage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <AppLayout>
+              <ProfilePage />
             </AppLayout>
           }
         />
