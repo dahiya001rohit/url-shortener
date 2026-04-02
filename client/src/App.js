@@ -7,6 +7,7 @@ import DashboardPage from "./Pages/DashboardPage";
 import AnalyticsPage from "./Pages/AnalyticsPage";
 import HomePage from "./Pages/HomePage";
 import ProfilePage from "./Pages/ProfilePage";
+import SettingsPage from "./Pages/SettingsPage";
 import "./index.css";
 import Footer from "./components/layout/Footer";
 
@@ -93,6 +94,14 @@ export default function App() {
           element={
             <AppLayout>
               <ProfilePage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <AppLayout>
+              <SettingsPage />
             </AppLayout>
           }
         />
