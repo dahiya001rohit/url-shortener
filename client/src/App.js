@@ -6,12 +6,14 @@ import RegisterPage from "./Pages/RegisterPage";
 import DashboardPage from "./Pages/DashboardPage";
 import AnalyticsPage from "./Pages/AnalyticsPage";
 import "./index.css";
+import Footer from "./components/layout/Footer";
 
 function MainLayout({ children }) {
   return (
     <>
       <Navbar />
       {children}
+      <Footer />
     </>
   );
 }

@@ -13,7 +13,6 @@ export default function LandingPage() {
       <FeaturesSection />
       <HowItWorks />
       <CTABanner />
-      <Footer />
     </main>
   );
 }

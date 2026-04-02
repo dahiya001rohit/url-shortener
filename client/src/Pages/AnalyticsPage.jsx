@@ -1,47 +1,67 @@
-import { useParams, Link } from "react-router-dom";
-import { ArrowLeft, BarChart2 } from "lucide-react";
+import { useState } from "react";
+import { useParams } from "react-router-dom";
+
+import AnalyticsHeader from "../components/analytics/AnalyticsHeader";
+import AnalyticsStatCards from "../components/analytics/AnalyticsStatCards";
+import ClickChart from "../components/analytics/ClickChart";
+import DeviceChart from "../components/analytics/DeviceChart";
+import CountryList from "../components/analytics/CountryList";
+import ReferrerList from "../components/analytics/ReferrerList";
+import BrowserChart from "../components/analytics/BrowserChart";
+import InsightCard from "../components/analytics/InsightCard";
+import LinkDetails from "../components/analytics/LinkDetails";
+
+// Mock data — will be replaced by real API calls
+const MOCK_STATS = {
+  totalClicks: 12482,
+  uniqueVisitors: 8291,
+  clickRate: 68.2,
+  avgPerDay: 142,
+};
+
+const MOCK_LINK = {
+  originalUrl: "https://www.archdaily.com/categories/architecture",
+  status: "Active",
+  createdAt: "2023-10-02T10:00:00Z",
+  expiresAt: null,
+};
 
 export default function AnalyticsPage() {
   const { shortCode } = useParams();
+  const [dateRange, setDateRange] = useState("7D");
 
   return (
-    <div className="min-h-screen bg-background pt-28 pb-16 px-6">
-      <div className="max-w-3xl mx-auto">
-        <Link
-          to="/dashboard"
-          className="inline-flex items-center gap-2 text-secondary hover:text-primary transition-colors mb-8 group"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span className="text-xs font-mono uppercase tracking-widest border-b border-transparent group-hover:border-primary transition-all">
-            Back to Dashboard
-          </span>
-        </Link>
+    <div className="bg-background min-h-screen">
+      <div className="max-w-6xl mx-auto px-8 pt-12 pb-24">
+        <AnalyticsHeader
+          shortCode={shortCode}
+          originalUrl={MOCK_LINK.originalUrl}
+          status={MOCK_LINK.status}
+          dateRange={dateRange}
+          onDateRangeChange={setDateRange}
+        />
 
-        <div className="flex items-center gap-3 mb-2">
-          <BarChart2 className="w-6 h-6 text-primary" />
-          <h1 className="text-3xl font-headline italic text-foreground">
-            Analytics
-          </h1>
-        </div>
-        <p className="text-secondary font-mono text-sm mb-12">
-          snip.ly/{shortCode}
-        </p>
+        <AnalyticsStatCards stats={MOCK_STATS} />
 
-        <div
-          className="bg-surface-container-lowest rounded-xl p-12 flex flex-col items-center justify-center text-center"
-          style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-        >
-          <div className="w-14 h-14 rounded-xl bg-surface-container flex items-center justify-center mb-4">
-            <BarChart2 className="w-6 h-6 text-secondary" />
-          </div>
-          <h2 className="text-xl font-headline italic text-foreground mb-2">
-            Coming soon.
-          </h2>
-          <p className="text-secondary font-body text-sm max-w-xs leading-relaxed">
-            Detailed click analytics, geographic data, and referral tracking
-            will be available here.
-          </p>
+        <ClickChart />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <DeviceChart />
+          <CountryList />
+          <ReferrerList />
         </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <BrowserChart />
+          <InsightCard />
+        </div>
+
+        <LinkDetails
+          shortCode={shortCode}
+          createdAt={MOCK_LINK.createdAt}
+          expiresAt={MOCK_LINK.expiresAt}
+          totalClicks={MOCK_STATS.totalClicks}
+        />
       </div>
     </div>
   );
