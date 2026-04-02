@@ -13,6 +13,7 @@ export async function getUrlAnalytics(req, res, next) {
 
     const [
       totalClicks,
+      uniqueVisitorDocs,
       clicksPerDay,
       topCountries,
       deviceBreakdown,
@@ -20,6 +21,8 @@ export async function getUrlAnalytics(req, res, next) {
       topReferrers,
     ] = await Promise.all([
       Click.countDocuments({ shortCode }),
+
+      Click.distinct("ip", { shortCode }),
 
       Click.aggregate([
         { $match: { shortCode, timestamp: { $gte: sevenDaysAgo } } },
@@ -59,8 +62,25 @@ export async function getUrlAnalytics(req, res, next) {
       ]),
     ]);
 
+    const uniqueVisitors = uniqueVisitorDocs.length;
+    const daysSinceCreated = Math.max(
+      1,
+      Math.ceil((Date.now() - new Date(url.createdAt).getTime()) / 86400000)
+    );
+    const avgPerDay = parseFloat((totalClicks / daysSinceCreated).toFixed(2));
+    const clickRate = totalClicks > 0 ? parseFloat(((uniqueVisitors / totalClicks) * 100).toFixed(1)) : 0;
+
     res.json({
+      link: {
+        originalUrl: url.originalUrl,
+        shortCode: url.shortCode,
+        createdAt: url.createdAt,
+        expiresAt: url.expiresAt || null,
+      },
       totalClicks,
+      uniqueVisitors,
+      avgPerDay,
+      clickRate,
       clicksPerDay,
       topCountries,
       deviceBreakdown,

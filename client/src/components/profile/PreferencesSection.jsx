@@ -1,31 +1,16 @@
 import { useState } from "react";
+import Card from "../shared/ui/Card";
+import Toggle from "../shared/ui/Toggle";
 
 const EMAIL_FREQ = ["Daily", "Weekly", "Monthly", "Never"];
 
 const NOTIFICATION_TOGGLES = [
-  { id: "weeklyDigest", label: "Weekly Analytics Digest", sub: "A summary of your top links every Monday" },
-  { id: "newFeatures", label: "New Feature Updates", sub: "Be first to know about new Snip features" },
-  { id: "linkExpiry", label: "Link Expiry Alerts", sub: "3-day warning before any link expires" },
-  { id: "trafficSurge", label: "Traffic Surge Alerts", sub: "Notify when a link gets a sudden spike" },
-  { id: "securityAlerts", label: "Security Alerts", sub: "New logins and suspicious activity" },
+  { id: "weeklyDigest", label: "Weekly Analytics Digest", description: "A summary of your top links every Monday" },
+  { id: "newFeatures", label: "New Feature Updates", description: "Be first to know about new Snip features" },
+  { id: "linkExpiry", label: "Link Expiry Alerts", description: "3-day warning before any link expires" },
+  { id: "trafficSurge", label: "Traffic Surge Alerts", description: "Notify when a link gets a sudden spike" },
+  { id: "securityAlerts", label: "Security Alerts", description: "New logins and suspicious activity" },
 ];
-
-function Toggle({ checked, onChange }) {
-  return (
-    <button
-      onClick={onChange}
-      className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${
-        checked ? "bg-primary" : "bg-surface-container-high"
-      }`}
-    >
-      <span
-        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
-          checked ? "translate-x-5" : "translate-x-0"
-        }`}
-      />
-    </button>
-  );
-}
 
 export default function PreferencesSection() {
   const [theme, setTheme] = useState("Light");
@@ -36,11 +21,7 @@ export default function PreferencesSection() {
 
   return (
     <div className="space-y-4">
-      {/* Theme */}
-      <div
-        className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-        style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-      >
+      <Card>
         <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
           Appearance
         </p>
@@ -62,36 +43,28 @@ export default function PreferencesSection() {
             </button>
           ))}
         </div>
-      </div>
+      </Card>
 
-      {/* Notifications */}
-      <div
-        className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-        style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-      >
+      <Card>
         <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
           Alerts
         </p>
-        <h3 className="text-xl font-headline italic text-foreground mb-5">
+        <h3 className="text-xl font-headline italic text-foreground mb-3">
           Notifications
         </h3>
-        <div className="space-y-4">
-          {NOTIFICATION_TOGGLES.map(({ id, label, sub }) => (
-            <div key={id} className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-sm font-body font-medium text-foreground">{label}</p>
-                <p className="text-xs font-body text-secondary mt-0.5">{sub}</p>
-              </div>
-              <Toggle
-                checked={notifs[id]}
-                onChange={() => setNotifs((n) => ({ ...n, [id]: !n[id] }))}
-              />
-            </div>
+        <div>
+          {NOTIFICATION_TOGGLES.map(({ id, label, description }) => (
+            <Toggle
+              key={id}
+              enabled={notifs[id]}
+              onChange={() => setNotifs((n) => ({ ...n, [id]: !n[id] }))}
+              label={label}
+              description={description}
+            />
           ))}
         </div>
 
-        {/* Email frequency */}
-        <div className="mt-6 pt-5 border-t border-outline-variant/20">
+        <div className="mt-5 pt-5 border-t border-outline-variant/20">
           <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-3">
             Email Frequency
           </p>
@@ -111,7 +84,7 @@ export default function PreferencesSection() {
             ))}
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

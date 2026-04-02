@@ -1,29 +1,22 @@
 import { Link2, MousePointerClick, Calendar, Zap } from "lucide-react";
+import Card from "../shared/ui/Card";
 
 export default function AccountOverview({ stats }) {
   const rows = [
     { icon: Link2, label: "Links Created", value: stats.totalLinks },
-    {
-      icon: MousePointerClick,
-      label: "Total Clicks",
-      value: stats.totalClicks.toLocaleString(),
-    },
+    { icon: MousePointerClick, label: "Total Clicks", value: stats.totalClicks.toLocaleString() },
     { icon: Calendar, label: "Member Since", value: stats.memberSince },
     { icon: Zap, label: "Current Plan", value: stats.plan },
   ];
 
   return (
-    <div
-      className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-      style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-    >
+    <Card>
       <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
         Overview
       </p>
       <h3 className="text-xl font-headline italic text-foreground mb-5">
         Account Stats
       </h3>
-
       <div className="space-y-0">
         {rows.map(({ icon: Icon, label, value }, i) => (
           <div
@@ -36,12 +29,10 @@ export default function AccountOverview({ stats }) {
               <Icon className="w-4 h-4 text-secondary shrink-0" />
               <span className="text-sm font-body text-secondary">{label}</span>
             </div>
-            <span className="text-sm font-mono font-medium text-foreground">
-              {value}
-            </span>
+            <span className="text-sm font-mono font-medium text-foreground">{value}</span>
           </div>
         ))}
       </div>
-    </div>
+    </Card>
   );
 }

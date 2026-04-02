@@ -1,6 +1,7 @@
 import { UAParser } from "ua-parser-js";
 import geoip from "geoip-lite";
 import Click from "../models/Click.js";
+import Url from "../models/Url.js";
 
 export async function processClick(job) {
   console.log(`job`, job.data )
@@ -36,4 +37,6 @@ export async function processClick(job) {
       browser: browserName,
       referrer: referrer || "Direct",
   });
+
+  await Url.findByIdAndUpdate(urlId, { $inc: { clicks: 1 } });
 }

@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { Eye, EyeOff, Monitor, Smartphone } from "lucide-react";
+import { Eye, EyeOff, Monitor } from "lucide-react";
+import Card from "../shared/ui/Card";
+import Button from "../shared/ui/Button";
+import Toggle from "../shared/ui/Toggle";
 
 function getStrength(pw) {
   if (pw.length < 6) return { label: "Weak", filled: 1, color: "bg-error" };
@@ -56,11 +59,7 @@ export default function SecurityForm() {
 
   return (
     <div className="space-y-4">
-      {/* Password change */}
-      <div
-        className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-        style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-      >
+      <Card>
         <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
           Password
         </p>
@@ -119,56 +118,32 @@ export default function SecurityForm() {
           )}
         </div>
 
-        <button
+        <Button
+          variant="primary"
+          size="sm"
+          className="mt-5"
           onClick={() => console.log("update password", fields)}
-          className="mt-5 px-5 py-2.5 rounded-xl text-sm font-mono uppercase tracking-wide bg-primary text-on-primary hover:bg-primary-container transition-colors"
         >
           Update Password
-        </button>
-      </div>
+        </Button>
+      </Card>
 
-      {/* 2FA */}
-      <div
-        className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-        style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-headline italic text-foreground">
-              Two-Factor Authentication
-            </h3>
-            <p className="text-xs font-body text-secondary mt-1 leading-relaxed max-w-sm">
-              Add an extra layer of security to your account.
-            </p>
-          </div>
-          {/* Toggle switch */}
-          <button
-            onClick={() => setTwoFA((v) => !v)}
-            className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
-              twoFA ? "bg-primary" : "bg-surface-container-high"
-            }`}
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
-                twoFA ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </button>
-        </div>
-      </div>
+      <Card>
+        <Toggle
+          enabled={twoFA}
+          onChange={() => setTwoFA((v) => !v)}
+          label="Two-Factor Authentication"
+          description="Add an extra layer of security to your account."
+        />
+      </Card>
 
-      {/* Active sessions */}
-      <div
-        className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-        style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-      >
+      <Card>
         <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
           Sessions
         </p>
         <h3 className="text-xl font-headline italic text-foreground mb-5">
           Active Sessions
         </h3>
-
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-surface-container flex items-center justify-center">
@@ -187,7 +162,7 @@ export default function SecurityForm() {
             Active now
           </span>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

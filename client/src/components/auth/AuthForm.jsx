@@ -4,6 +4,7 @@ import { ArrowRight, Eye, EyeOff } from "lucide-react";
 import AuthInput from "./AuthInput";
 import AuthDivider from "./AuthDivider";
 import GoogleButton from "./GoogleButton";
+import Button from "../shared/ui/Button";
 
 const PASSWORD_STRENGTH = [
   { min: 0,  label: "Too short", filled: 1 },
@@ -182,15 +183,15 @@ export default function AuthForm({ variant = "login", onSubmit }) {
 
         {/* Submit + Google */}
         <div className="flex flex-col gap-4 pt-2">
-          <button
+          <Button
             type="submit"
-            className="w-full bg-primary text-white py-4 px-8 rounded-full flex items-center justify-between group hover:bg-on-primary-fixed-variant transition-all duration-300"
+            variant="primary"
+            size="lg"
+            className="w-full justify-between group"
           >
-            <span className="text-xs font-mono uppercase tracking-widest font-medium">
-              {isLogin ? "Sign In" : "Create Account"}
-            </span>
+            <span>{isLogin ? "Sign In" : "Create Account"}</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </button>
+          </Button>
 
           <AuthDivider />
           <GoogleButton />

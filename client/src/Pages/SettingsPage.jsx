@@ -5,6 +5,9 @@ import NotificationsTab from "../components/settings/NotificationsTab";
 import LinksTab from "../components/settings/LinksTab";
 import PrivacyTab from "../components/settings/PrivacyTab";
 import IntegrationsTab from "../components/settings/IntegrationsTab";
+import PageHeader from "../components/shared/layout/PageHeader";
+import SidebarNav from "../components/shared/layout/SidebarNav";
+import Card from "../components/shared/ui/Card";
 
 const SETTINGS_TABS = [
   { id: "appearance", label: "Appearance", icon: Palette },
@@ -27,42 +30,21 @@ export default function SettingsPage() {
   return (
     <div className="bg-background min-h-screen">
       <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
-        {/* Page Header */}
-        <p className="font-mono text-xs uppercase tracking-widest text-outline">
-          Settings
-        </p>
-        <h1 className="font-headline italic text-5xl text-primary mt-1">
-          Preferences.
-        </h1>
-        <p className="text-sm font-body text-secondary mt-1">
-          Customize your Snip experience.
-        </p>
+        <PageHeader
+          label="Settings"
+          heading="Preferences."
+          subtext="Customize your Snip experience."
+        />
 
         <div className="grid grid-cols-12 gap-8 mt-10">
-          {/* Left Sidebar */}
           <div className="col-span-2">
-            <nav className="space-y-0.5">
-              {SETTINGS_TABS.map(({ id, label, icon: Icon }) => {
-                const isActive = activeTab === id;
-                return (
-                  <button
-                    key={id}
-                    onClick={() => setActiveTab(id)}
-                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-body transition-all text-left border-l-2 ${
-                      isActive
-                        ? "border-primary text-primary font-bold bg-primary/5"
-                        : "border-transparent text-secondary hover:text-primary hover:bg-surface-container"
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 shrink-0" />
-                    {label}
-                  </button>
-                );
-              })}
-            </nav>
+            <SidebarNav
+              tabs={SETTINGS_TABS}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+            />
           </div>
 
-          {/* Main Content */}
           <div className="col-span-7">
             {activeTab === "appearance" && <AppearanceTab />}
             {activeTab === "notifications" && <NotificationsTab />}
@@ -71,20 +53,15 @@ export default function SettingsPage() {
             {activeTab === "integrations" && <IntegrationsTab />}
           </div>
 
-          {/* Right Panel */}
           <div className="col-span-3 space-y-4">
-            {/* Current Config */}
-            <div
-              className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-              style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-            >
+            <Card>
               <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
                 Summary
               </p>
               <h3 className="text-xl font-headline italic text-foreground mb-5">
                 Current Config
               </h3>
-              <div className="space-y-0">
+              <div>
                 {CONFIG_ROWS.map(({ label, value }, i) => (
                   <div
                     key={label}
@@ -94,18 +71,13 @@ export default function SettingsPage() {
                         : ""
                     }`}
                   >
-                    <span className="text-xs font-body text-secondary">
-                      {label}
-                    </span>
-                    <span className="text-xs font-mono font-medium text-foreground">
-                      {value}
-                    </span>
+                    <span className="text-xs font-body text-secondary">{label}</span>
+                    <span className="text-xs font-mono font-medium text-foreground">{value}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
 
-            {/* Need Help */}
             <div
               className="bg-primary rounded-2xl p-6 relative overflow-hidden"
               style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.1)" }}
@@ -113,8 +85,7 @@ export default function SettingsPage() {
               <div
                 className="absolute inset-0 pointer-events-none opacity-[0.05]"
                 style={{
-                  backgroundImage:
-                    "radial-gradient(rgba(255,255,255,1) 1px, transparent 1px)",
+                  backgroundImage: "radial-gradient(rgba(255,255,255,1) 1px, transparent 1px)",
                   backgroundSize: "20px 20px",
                 }}
               />
@@ -130,8 +101,7 @@ export default function SettingsPage() {
                 </p>
                 <button
                   onClick={() => console.log("open docs")}
-                  className="w-full py-2 rounded-full text-xs font-mono uppercase tracking-wide transition-colors"
-                  style={{ background: "#FFB95F", color: "#2A1700" }}
+                  className="w-full py-2 rounded-full text-xs font-mono uppercase tracking-wide bg-accent text-on-accent hover:opacity-90 transition-colors"
                 >
                   View Docs
                 </button>

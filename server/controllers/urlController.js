@@ -5,9 +5,21 @@ import { analyticsQueue } from "../services/queue.js";
 
 export async function shortenUrl(req, res, next) {
   try {
-    const { originalUrl, expiresAt } = req.body;
+    const { originalUrl, expiresAt, customAlias } = req.body;
 
-    const shortCode = nanoid(6);
+    let shortCode;
+    if (customAlias) {
+      const trimmed = customAlias.trim();
+      if (!/^[a-zA-Z0-9_-]{3,30}$/.test(trimmed)) {
+        return res.status(400).json({ message: "Alias must be 3–30 chars (letters, numbers, - _)" });
+      }
+      const existing = await Url.findOne({ shortCode: trimmed });
+      if (existing) return res.status(409).json({ message: "That alias is already taken" });
+      shortCode = trimmed;
+    } else {
+      shortCode = nanoid(6);
+    }
+
     const url = await Url.create({
       originalUrl,
       shortCode,

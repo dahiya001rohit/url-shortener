@@ -1,4 +1,5 @@
 import { Link2, Plus } from "lucide-react";
+import Button from "../shared/ui/Button";
 
 export default function PageHeader({ totalLinks, onNewSnip }) {
   return (
@@ -15,13 +16,10 @@ export default function PageHeader({ totalLinks, onNewSnip }) {
           </span>
         </p>
       </div>
-      <button
-        onClick={onNewSnip}
-        className="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-xl text-sm font-mono uppercase tracking-wide hover:bg-primary-container transition-colors"
-      >
+      <Button variant="primary" size="sm" onClick={onNewSnip}>
         <Plus className="w-4 h-4" />
         New Snip
-      </button>
+      </Button>
     </div>
   );
 }

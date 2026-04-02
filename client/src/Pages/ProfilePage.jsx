@@ -7,6 +7,7 @@ import BillingSection from "../components/profile/BillingSection";
 import PreferencesSection from "../components/profile/PreferencesSection";
 import AccountOverview from "../components/profile/AccountOverview";
 import DangerZone from "../components/profile/DangerZone";
+import PageHeader from "../components/shared/layout/PageHeader";
 
 const user = {
   name: "Rohit Kumar",
@@ -23,21 +24,13 @@ export default function ProfilePage() {
   return (
     <div className="bg-background min-h-screen">
       <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
-        {/* Page header */}
-        <p className="font-mono text-xs uppercase tracking-widest text-outline">
-          Profile
-        </p>
-        <h1 className="font-headline italic text-5xl text-primary mt-1">
-          Your Account.
-        </h1>
+        <PageHeader label="Profile" heading="Your Account." />
 
         <div className="grid grid-cols-12 gap-8 mt-10">
-          {/* Left sidebar */}
           <div className="col-span-2">
             <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
-          {/* Main content */}
           <div className="col-span-7 space-y-4">
             <ProfileCard user={user} />
 
@@ -49,7 +42,6 @@ export default function ProfilePage() {
             {activeTab === "preferences" && <PreferencesSection />}
           </div>
 
-          {/* Right panel */}
           <div className="col-span-3 space-y-4">
             <AccountOverview
               stats={{

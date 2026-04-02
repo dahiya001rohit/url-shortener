@@ -1,4 +1,6 @@
 import { Check, X } from "lucide-react";
+import Card from "../shared/ui/Card";
+import Badge from "../shared/ui/Badge";
 
 const FREE_FEATURES = [
   { label: "50 Active Links", included: true },
@@ -35,10 +37,7 @@ function FeatureRow({ label, included, light }) {
 
 export default function BillingSection() {
   return (
-    <div
-      className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6"
-      style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
-    >
+    <Card>
       <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
         Billing
       </p>
@@ -49,13 +48,9 @@ export default function BillingSection() {
       <div className="grid grid-cols-2 gap-4">
         {/* Free */}
         <div className="bg-surface-container-low border border-outline-variant/40 rounded-2xl p-5 flex flex-col">
-          <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
-            Current
-          </p>
+          <Badge variant="noExpiry" className="self-start mb-2">Current</Badge>
           <h4 className="text-lg font-headline italic text-foreground">Free</h4>
-          <p className="text-xs font-body text-secondary mb-4">
-            For minimalist curators
-          </p>
+          <p className="text-xs font-body text-secondary mb-4">For minimalist curators</p>
           <p className="text-3xl font-headline text-foreground mb-5">
             $0<span className="text-sm font-body text-secondary">/mo</span>
           </p>
@@ -82,13 +77,9 @@ export default function BillingSection() {
             }}
           />
           <div className="relative z-10 flex flex-col h-full">
-            <p className="text-xs font-mono uppercase tracking-widest text-on-primary-container mb-1">
-              Recommended
-            </p>
+            <Badge variant="premium" className="self-start mb-2">Recommended</Badge>
             <h4 className="text-lg font-headline italic text-white">Pro</h4>
-            <p className="text-xs font-body text-white/60 mb-4">
-              For the digital architects
-            </p>
+            <p className="text-xs font-body text-white/60 mb-4">For the digital architects</p>
             <p className="text-3xl font-headline text-white mb-5">
               $12<span className="text-sm font-body text-white/60">/mo</span>
             </p>
@@ -99,14 +90,13 @@ export default function BillingSection() {
             </div>
             <button
               onClick={() => console.log("upgrade to pro")}
-              className="mt-5 w-full py-2.5 rounded-full text-xs font-mono uppercase tracking-wide transition-colors"
-              style={{ background: "#FFB95F", color: "#2A1700" }}
+              className="mt-5 w-full py-2.5 rounded-full text-xs font-mono uppercase tracking-wide transition-colors bg-accent text-on-accent hover:opacity-90"
             >
               Upgrade Now
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
