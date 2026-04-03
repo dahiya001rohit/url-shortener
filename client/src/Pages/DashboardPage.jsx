@@ -96,26 +96,22 @@ export default function DashboardPage() {
   }
 
   async function handleNewSnip({ originalUrl, customAlias, expiresAt }) {
-    try {
-      const { data } = await api.post("/url/shorten", {
-        originalUrl,
-        ...(customAlias && { customAlias }),
-        ...(expiresAt && { expiresAt }),
-      });
-      setLinks((prev) => [
-        {
-          _id: data._id || String(Date.now()),
-          originalUrl: data.originalUrl,
-          shortCode: data.shortCode,
-          clicks: 0,
-          createdAt: new Date().toISOString(),
-          expiresAt: data.expiresAt || undefined,
-        },
-        ...prev,
-      ]);
-    } catch (err) {
-      console.error("Failed to create snip", err);
-    }
+    const { data } = await api.post("/url/shorten", {
+      originalUrl,
+      ...(customAlias && { customAlias }),
+      ...(expiresAt && { expiresAt }),
+    });
+    setLinks((prev) => [
+      {
+        _id: data._id || String(Date.now()),
+        originalUrl: data.originalUrl,
+        shortCode: data.shortCode,
+        clicks: 0,
+        createdAt: new Date().toISOString(),
+        expiresAt: data.expiresAt || undefined,
+      },
+      ...prev,
+    ]);
   }
 
   return (

@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 export function CTABanner() {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -27,10 +29,16 @@ export function CTABanner() {
           Ready to shorten?
         </h2>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-          <button className="w-full sm:w-auto px-12 py-5 bg-on-tertiary-container text-on-tertiary rounded font-medium transition-all text-lg btn-interact animate-pulse-slow">
+          <button
+            onClick={() => navigate("/register")}
+            className="w-full sm:w-auto px-12 py-5 bg-on-tertiary-container text-on-tertiary rounded font-medium transition-all text-lg btn-interact animate-pulse-slow"
+          >
             Start for Free
           </button>
-          <button className="w-full sm:w-auto px-12 py-5 border border-primary text-primary rounded font-medium transition-all text-lg btn-interact hover:bg-primary/5">
+          <button
+            onClick={() => navigate("/demo")}
+            className="w-full sm:w-auto px-12 py-5 border border-primary text-primary rounded font-medium transition-all text-lg btn-interact hover:bg-primary/5"
+          >
             View Demo
           </button>
         </div>

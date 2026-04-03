@@ -1,20 +1,38 @@
-import { useState } from "react";
-import { ArrowRight, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowRight, Check, Loader2 } from "lucide-react";
+
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
 
 export default function QuickSnipCard({ onSnip }) {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState(null); // { shortCode }
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const autoSnip = sessionStorage.getItem("autoSnip");
+    if (autoSnip) {
+      setUrl(autoSnip);
+      sessionStorage.removeItem("autoSnip");
+    }
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
     if (!url.trim()) return;
+    setError("");
+    setLoading(true);
     try {
       const data = await onSnip?.(url);
-      setResult({ shortCode: data?.shortCode || "—" });
+      const shortCode = data?.shortCode || "—";
+      navigator.clipboard.writeText(`${SERVER_BASE}/${shortCode}`).catch(() => {});
+      setResult({ shortCode });
       setUrl("");
-      setTimeout(() => setResult(null), 3000);
-    } catch {
-      // onSnip throws → show nothing special
+      setTimeout(() => setResult(null), 4000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to shorten URL");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -40,30 +58,37 @@ export default function QuickSnipCard({ onSnip }) {
               <Check className="w-4 h-4 text-accent" />
             </div>
             <div>
-              <p className="text-white text-sm font-body">Copied!</p>
+              <p className="text-white text-sm font-body">Copied to clipboard!</p>
               <p className="font-mono text-xs text-accent">
-                snip.ly/{result.shortCode}
+                {SERVER_BASE.replace(/^https?:\/\//, "")}/{result.shortCode}
               </p>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="flex gap-3">
-            <input
-              type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="Paste your long URL here..."
-              className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm font-body text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-all"
-            />
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-5 py-3 rounded-xl font-mono text-sm uppercase tracking-wide transition-colors shrink-0"
-              style={{ background: "#FFB95F", color: "#2A1700" }}
-            >
-              Snip it
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
+          <>
+            <form onSubmit={handleSubmit} className="flex gap-3">
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => { setUrl(e.target.value); setError(""); }}
+                placeholder="Paste your long URL here..."
+                className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm font-body text-white placeholder:text-white/40 focus:outline-none focus:border-accent transition-all"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex items-center gap-2 px-5 py-3 rounded-xl font-mono text-sm uppercase tracking-wide transition-colors shrink-0 disabled:opacity-60"
+                style={{ background: "#FFB95F", color: "#2A1700" }}
+              >
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+                  <>Snip it <ArrowRight className="w-4 h-4" /></>
+                )}
+              </button>
+            </form>
+            {error && (
+              <p className="text-accent text-xs font-mono mt-2">{error}</p>
+            )}
+          </>
         )}
       </div>
     </div>

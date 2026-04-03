@@ -1,29 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "../shared/ui/Card";
 import Input from "../shared/ui/Input";
 import Button from "../shared/ui/Button";
 
 export default function PersonalInfoForm({ user, onSave }) {
-  const initial = {
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
     name: user.name,
     email: user.email,
     bio: "Digital curator and minimalist designer. Organizing the web, one snip at a time.",
-  };
+  });
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(initial);
+  useEffect(() => {
+    if (!isEditing) {
+      setFormData((prev) => ({ ...prev, name: user.name, email: user.email }));
+    }
+  }, [user.name, user.email, isEditing]);
 
   function handleChange(e) {
     setFormData((f) => ({ ...f, [e.target.name]: e.target.value }));
   }
 
-  function handleSave() {
-    onSave?.(formData);
-    setIsEditing(false);
+  async function handleSave() {
+    setSaving(true);
+    setSuccess(false);
+    setError("");
+    try {
+      await onSave?.(formData);
+      setIsEditing(false);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to save changes");
+    } finally {
+      setSaving(false);
+    }
   }
 
   function handleCancel() {
-    setFormData(initial);
+    setFormData((prev) => ({ ...prev, name: user.name, email: user.email }));
+    setError("");
     setIsEditing(false);
   }
 
@@ -39,7 +58,7 @@ export default function PersonalInfoForm({ user, onSave }) {
           </h3>
         </div>
         {!isEditing && (
-          <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
+          <Button variant="ghost" size="sm" onClick={() => { setIsEditing(true); setSuccess(false); }}>
             Edit
           </Button>
         )}
@@ -72,12 +91,19 @@ export default function PersonalInfoForm({ user, onSave }) {
         />
       </div>
 
+      {error && (
+        <p className="text-[10px] text-error font-mono uppercase tracking-widest mt-3">{error}</p>
+      )}
+      {success && !isEditing && (
+        <p className="text-[10px] text-primary font-mono uppercase tracking-widest mt-3">Changes saved!</p>
+      )}
+
       {isEditing && (
         <div className="flex gap-3 mt-5">
-          <Button variant="primary" size="sm" onClick={handleSave}>
-            Save Changes
+          <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
+            {saving ? "Saving…" : "Save Changes"}
           </Button>
-          <Button variant="secondary" size="sm" onClick={handleCancel}>
+          <Button variant="secondary" size="sm" onClick={handleCancel} disabled={saving}>
             Cancel
           </Button>
         </div>

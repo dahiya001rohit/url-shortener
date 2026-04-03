@@ -6,6 +6,8 @@ import LoginPage from "./Pages/LoginPage";
 import RegisterPage from "./Pages/RegisterPage";
 import DashboardPage from "./Pages/DashboardPage";
 import AnalyticsPage from "./Pages/AnalyticsPage";
+import DemoPage from "./Pages/DemoPage";
+import DemoAnalyticsPage from "./Pages/DemoAnalyticsPage";
 import HomePage from "./Pages/HomePage";
 import ProfilePage from "./Pages/ProfilePage";
 import SettingsPage from "./Pages/SettingsPage";
@@ -138,6 +140,8 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/demo" element={<DemoPage />} />
+        <Route path="/demo/analytics/:shortCode" element={<DemoAnalyticsPage />} />
       </Routes>
     </BrowserRouter>
   );

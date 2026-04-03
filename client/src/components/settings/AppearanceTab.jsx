@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sun, Moon, Monitor } from "lucide-react";
 import Card from "../shared/ui/Card";
 
@@ -51,11 +51,56 @@ function ThemeCard({ theme, isActive, onClick }) {
   );
 }
 
+function applyTheme(theme) {
+  const root = document.documentElement;
+  if (theme === "dark") {
+    root.classList.add("dark");
+  } else if (theme === "light") {
+    root.classList.remove("dark");
+  } else {
+    // system
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    root.classList.toggle("dark", prefersDark);
+  }
+}
+
 export default function AppearanceTab() {
-  const [theme, setTheme] = useState("light");
-  const [accentColor, setAccentColor] = useState("#002f2d");
-  const [density, setDensity] = useState("comfortable");
-  const [fontSize, setFontSize] = useState(14);
+  const [theme, setTheme] = useState(() => localStorage.getItem("snip_theme") || "light");
+  const [accentColor, setAccentColor] = useState(() => localStorage.getItem("snip_accent") || "#002f2d");
+  const [density, setDensity] = useState(() => localStorage.getItem("snip_density") || "comfortable");
+  const [fontSize, setFontSize] = useState(() => Number(localStorage.getItem("snip_fontSize")) || 14);
+
+  useEffect(() => { applyTheme(theme); }, [theme]);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${fontSize}px`;
+  }, [fontSize]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-density", density);
+  }, [density]);
+
+  function handleTheme(t) {
+    setTheme(t);
+    localStorage.setItem("snip_theme", t);
+  }
+
+  function handleAccent(value) {
+    setAccentColor(value);
+    localStorage.setItem("snip_accent", value);
+    document.documentElement.style.setProperty("--color-primary-raw", value);
+  }
+
+  function handleDensity(d) {
+    setDensity(d);
+    localStorage.setItem("snip_density", d);
+  }
+
+  function handleFontSize(val) {
+    const n = Number(val);
+    setFontSize(n);
+    localStorage.setItem("snip_fontSize", String(n));
+  }
 
   return (
     <div className="space-y-4">
@@ -64,7 +109,7 @@ export default function AppearanceTab() {
         <h3 className="text-xl font-headline italic text-foreground mb-5">Theme Preference</h3>
         <div className="grid grid-cols-3 gap-3">
           {["light", "dark", "system"].map((t) => (
-            <ThemeCard key={t} theme={t} isActive={theme === t} onClick={() => { setTheme(t); console.log("theme:", t); }} />
+            <ThemeCard key={t} theme={t} isActive={theme === t} onClick={() => handleTheme(t)} />
           ))}
         </div>
       </Card>
@@ -76,7 +121,7 @@ export default function AppearanceTab() {
           {ACCENT_COLORS.map(({ value, label }) => (
             <button
               key={value}
-              onClick={() => { setAccentColor(value); console.log("accent:", value); }}
+              onClick={() => handleAccent(value)}
               className={`w-8 h-8 rounded-full transition-all ${accentColor === value ? "ring-2 ring-offset-2 ring-primary scale-110" : "hover:scale-105"}`}
               style={{ backgroundColor: value }}
               title={label}
@@ -92,7 +137,7 @@ export default function AppearanceTab() {
           {["comfortable", "compact", "cozy"].map((d) => (
             <button
               key={d}
-              onClick={() => { setDensity(d); console.log("density:", d); }}
+              onClick={() => handleDensity(d)}
               className={`flex-1 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wide transition-colors ${
                 density === d ? "bg-primary text-on-primary" : "bg-surface-container text-secondary hover:bg-surface-container-high"
               }`}
@@ -114,7 +159,7 @@ export default function AppearanceTab() {
           min={12}
           max={20}
           value={fontSize}
-          onChange={(e) => { setFontSize(Number(e.target.value)); console.log("fontSize:", e.target.value); }}
+          onChange={(e) => handleFontSize(e.target.value)}
           className="w-full accent-primary"
         />
         <div className="flex justify-between mt-2">

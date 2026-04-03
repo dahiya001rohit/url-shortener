@@ -20,6 +20,11 @@ export default function RegisterPage() {
     try {
       await register(name, email, password);
       await login(email, password);
+      const pendingUrl = sessionStorage.getItem("pendingUrl");
+      if (pendingUrl) {
+        sessionStorage.removeItem("pendingUrl");
+        sessionStorage.setItem("autoSnip", pendingUrl);
+      }
       navigate("/home");
     } catch (err) {
       setApiError(err.response?.data?.message || "Registration failed. Please try again.");

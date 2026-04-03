@@ -48,6 +48,7 @@ export default function SecurityForm({ onChangePassword }) {
   const [twoFA, setTwoFA] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const strength = getStrength(fields.newPassword);
 
@@ -130,23 +131,31 @@ export default function SecurityForm({ onChangePassword }) {
           variant="primary"
           size="sm"
           className="mt-5"
+          disabled={loading}
           onClick={async () => {
             if (fields.newPassword !== fields.confirmPassword) {
               setError("Passwords do not match");
               return;
             }
+            if (fields.newPassword.length < 6) {
+              setError("Password must be at least 6 characters");
+              return;
+            }
             setError("");
             setSuccess(false);
+            setLoading(true);
             try {
               await onChangePassword?.(fields.currentPassword, fields.newPassword);
               setFields({ currentPassword: "", newPassword: "", confirmPassword: "" });
               setSuccess(true);
             } catch (err) {
               setError(err.response?.data?.message || "Failed to update password");
+            } finally {
+              setLoading(false);
             }
           }}
         >
-          Update Password
+          {loading ? "Updating…" : "Update Password"}
         </Button>
       </Card>
 

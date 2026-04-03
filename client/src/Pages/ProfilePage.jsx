@@ -4,7 +4,6 @@ import ProfileCard from "../components/profile/ProfileCard";
 import ProfileSidebar from "../components/profile/ProfileSidebar";
 import PersonalInfoForm from "../components/profile/PersonalInfoForm";
 import SecurityForm from "../components/profile/SecurityForm";
-import BillingSection from "../components/profile/BillingSection";
 import PreferencesSection from "../components/profile/PreferencesSection";
 import AccountOverview from "../components/profile/AccountOverview";
 import DangerZone from "../components/profile/DangerZone";
@@ -26,7 +25,6 @@ export default function ProfilePage() {
     memberSince: user?.memberSince
       ? new Date(user.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })
       : "—",
-    plan: user?.plan || "Free",
   };
 
   async function handleSave(formData) {
@@ -66,7 +64,6 @@ export default function ProfilePage() {
             {activeTab === "security" && (
               <SecurityForm onChangePassword={handleChangePassword} />
             )}
-            {activeTab === "billing" && <BillingSection />}
             {activeTab === "preferences" && <PreferencesSection />}
           </div>
 
@@ -76,7 +73,6 @@ export default function ProfilePage() {
                 totalLinks: profileUser.totalLinks,
                 totalClicks: profileUser.totalClicks,
                 memberSince: profileUser.memberSince,
-                plan: profileUser.plan,
               }}
             />
             <DangerZone onDelete={handleDeleteAccount} />

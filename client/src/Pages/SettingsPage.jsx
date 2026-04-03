@@ -20,7 +20,6 @@ const SETTINGS_TABS = [
 const CONFIG_ROWS = [
   { label: "Theme", value: "Light" },
   { label: "Region", value: "US/Pacific" },
-  { label: "Plan", value: "Free" },
   { label: "API Access", value: "Enabled" },
 ];
 

@@ -4,10 +4,8 @@ import { Link2, User, LogOut, LayoutDashboard, Settings } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const NAV_LINKS = [
-  { label: "Product", href: "#" },
-  { label: "Features", href: "#features" },
-  { label: "Analytics", href: "#" },
-  { label: "Pricing", href: "#" },
+  { label: "Features", targetId: "features" },
+  { label: "Analytics", targetId: "analytics" },
 ];
 
 export function Navbar() {
@@ -50,14 +48,20 @@ export function Navbar() {
         {!isLoggedIn && (
           <div className="hidden md:flex items-center gap-8 font-body text-sm tracking-wide">
             {NAV_LINKS.map((link) => (
-              <a
+              <button
                 key={link.label}
-                href={link.href}
+                onClick={() => document.getElementById(link.targetId)?.scrollIntoView({ behavior: "smooth" })}
                 className="text-emerald-800/70 hover:text-emerald-600 transition-colors duration-300"
               >
                 {link.label}
-              </a>
+              </button>
             ))}
+            <button
+              onClick={() => navigate("/demo")}
+              className="text-sm font-mono text-accent hover:underline"
+            >
+              Live Demo →
+            </button>
           </div>
         )}
 

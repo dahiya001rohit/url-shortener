@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Link2, ArrowRight, Sparkles, Lock } from "lucide-react";
 
@@ -45,7 +46,17 @@ const slideUp = {
 export function HeroSection() {
   const [pIdx, setPIdx] = useState(0);
   const [inputVisible, setInputVisible] = useState(true);
+  const [url, setUrl] = useState("");
+  const [showGate, setShowGate] = useState(false);
   const inputRef = useRef(null);
+  const navigate = useNavigate();
+
+  function handleShorten() {
+    if (!url) return;
+    sessionStorage.setItem("pendingUrl", url);
+    setShowGate(true);
+    setTimeout(() => navigate("/register"), 2000);
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -110,23 +121,40 @@ export function HeroSection() {
             </div>
             <input
               ref={inputRef}
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleShorten()}
               className="w-full bg-transparent border-none focus:ring-0 font-mono text-lg py-4 px-4 outline-none transition-opacity duration-500"
               placeholder={PLACEHOLDERS[pIdx]}
               style={{ opacity: inputVisible ? 1 : 0 }}
               type="text"
             />
-            <button className="bg-primary text-on-primary px-8 py-4 rounded-full font-medium hover:bg-primary-container transition-all flex items-center gap-2 btn-interact whitespace-nowrap">
+            <button
+              onClick={handleShorten}
+              className="bg-primary text-on-primary px-8 py-4 rounded-full font-medium hover:bg-primary-container transition-all flex items-center gap-2 btn-interact whitespace-nowrap"
+            >
               Snip it
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
-          <div className="mt-6 flex flex-wrap justify-center gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-outline/60">
-            <span>No account needed</span>
-            <span className="w-1 h-1 bg-outline/20 rounded-full mt-1.5" />
-            <span>Free forever</span>
-            <span className="w-1 h-1 bg-outline/20 rounded-full mt-1.5" />
-            <span>Custom aliases</span>
-          </div>
+          {showGate ? (
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center justify-center gap-2 mt-3"
+            >
+              <span className="text-xs font-mono text-accent">✦ Create a free account to get your short link</span>
+              <span className="text-xs font-mono text-outline">— redirecting you now...</span>
+            </motion.div>
+          ) : (
+            <div className="mt-6 flex flex-wrap justify-center gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-outline/60">
+              <span>No account needed</span>
+              <span className="w-1 h-1 bg-outline/20 rounded-full mt-1.5" />
+              <span>Free forever</span>
+              <span className="w-1 h-1 bg-outline/20 rounded-full mt-1.5" />
+              <span>Custom aliases</span>
+            </div>
+          )}
         </motion.div>
 
         {/* 3D Mockup */}

@@ -1,4 +1,4 @@
-import { Link2, MousePointerClick, Calendar, Zap } from "lucide-react";
+import { Link2, MousePointerClick, Calendar } from "lucide-react";
 import Card from "../shared/ui/Card";
 
 export default function AccountOverview({ stats }) {
@@ -6,7 +6,6 @@ export default function AccountOverview({ stats }) {
     { icon: Link2, label: "Links Created", value: stats.totalLinks },
     { icon: MousePointerClick, label: "Total Clicks", value: stats.totalClicks.toLocaleString() },
     { icon: Calendar, label: "Member Since", value: stats.memberSince },
-    { icon: Zap, label: "Current Plan", value: stats.plan },
   ];
 
   return (

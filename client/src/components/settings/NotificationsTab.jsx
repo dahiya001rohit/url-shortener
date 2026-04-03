@@ -10,11 +10,37 @@ const NOTIFICATION_ITEMS = [
   { id: "securityAlerts", label: "Security Alerts", description: "New logins and suspicious activity" },
 ];
 
+const DEFAULT_NOTIFICATIONS = Object.fromEntries(
+  NOTIFICATION_ITEMS.map((item) => [item.id, item.id !== "clickMilestones"])
+);
+
+function load() {
+  try {
+    const saved = localStorage.getItem("snip_notifications");
+    return saved ? JSON.parse(saved) : DEFAULT_NOTIFICATIONS;
+  } catch {
+    return DEFAULT_NOTIFICATIONS;
+  }
+}
+
 export default function NotificationsTab() {
-  const [notifications, setNotifications] = useState(
-    Object.fromEntries(NOTIFICATION_ITEMS.map((item) => [item.id, item.id !== "clickMilestones"]))
+  const [notifications, setNotifications] = useState(load);
+  const [emailFrequency, setEmailFrequency] = useState(
+    () => localStorage.getItem("snip_email_freq") || "weekly"
   );
-  const [emailFrequency, setEmailFrequency] = useState("weekly");
+
+  function toggleNotification(id) {
+    setNotifications((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      localStorage.setItem("snip_notifications", JSON.stringify(next));
+      return next;
+    });
+  }
+
+  function handleEmailFrequency(freq) {
+    setEmailFrequency(freq);
+    localStorage.setItem("snip_email_freq", freq);
+  }
 
   return (
     <div className="space-y-4">
@@ -30,10 +56,7 @@ export default function NotificationsTab() {
             <Toggle
               key={id}
               enabled={notifications[id]}
-              onChange={() => {
-                setNotifications((prev) => ({ ...prev, [id]: !prev[id] }));
-                console.log("notification toggled:", id);
-              }}
+              onChange={() => toggleNotification(id)}
               label={label}
               description={description}
             />
@@ -52,10 +75,7 @@ export default function NotificationsTab() {
           {["instant", "daily", "weekly"].map((freq) => (
             <button
               key={freq}
-              onClick={() => {
-                setEmailFrequency(freq);
-                console.log("emailFrequency:", freq);
-              }}
+              onClick={() => handleEmailFrequency(freq)}
               className={`flex-1 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wide transition-colors ${
                 emailFrequency === freq
                   ? "bg-primary text-on-primary"

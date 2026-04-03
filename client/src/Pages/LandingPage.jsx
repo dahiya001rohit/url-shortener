@@ -1,4 +1,3 @@
-import Footer from "../components/layout/Footer";
 import HeroSection from "../components/sections/HeroSection";
 import StatsBar from "../components/sections/StatsBar";
 import FeaturesSection from "../components/sections/FeaturesSection";
@@ -9,10 +8,10 @@ export default function LandingPage() {
   return (
     <main>
       <HeroSection />
-      <StatsBar />
-      <FeaturesSection />
+      <div id="analytics"><StatsBar /></div>
+      <div id="features"><FeaturesSection /></div>
       <HowItWorks />
-      <CTABanner />
+      <div id="cta"><CTABanner /></div>
     </main>
   );
 }

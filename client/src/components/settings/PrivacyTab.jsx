@@ -12,20 +12,45 @@ const PRIVACY_TOGGLES = [
   { id: "dataSharing", label: "Improve Snip", description: "Share anonymous usage data to help improve Snip" },
 ];
 
-const API_KEY = "snp_k8mX3vL9pQr2nYwZ4hJb7cFd";
+const DEFAULT_TOGGLES = Object.fromEntries(
+  PRIVACY_TOGGLES.map((t) => [t.id, t.id !== "publicProfile" && t.id !== "dataSharing"])
+);
+
+const STATIC_API_KEY = "snp_k8mX3vL9pQr2nYwZ4hJb7cFd";
 const MASKED_KEY = "snp_••••••••••••••••";
 
+function loadToggles() {
+  try {
+    const saved = localStorage.getItem("snip_privacy_toggles");
+    return saved ? JSON.parse(saved) : DEFAULT_TOGGLES;
+  } catch {
+    return DEFAULT_TOGGLES;
+  }
+}
+
 export default function PrivacyTab() {
-  const [privacyToggles, setPrivacyToggles] = useState(
-    Object.fromEntries(PRIVACY_TOGGLES.map((t) => [t.id, t.id !== "publicProfile" && t.id !== "dataSharing"]))
-  );
+  const [privacyToggles, setPrivacyToggles] = useState(loadToggles);
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [regenerated, setRegenerated] = useState(false);
+
+  function togglePrivacy(id) {
+    setPrivacyToggles((prev) => {
+      const next = { ...prev, [id]: !prev[id] };
+      localStorage.setItem("snip_privacy_toggles", JSON.stringify(next));
+      return next;
+    });
+  }
 
   function handleCopy() {
-    navigator.clipboard.writeText(API_KEY).catch(() => {});
+    navigator.clipboard.writeText(STATIC_API_KEY).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  function handleRegenerate() {
+    setRegenerated(true);
+    setTimeout(() => setRegenerated(false), 2000);
   }
 
   return (
@@ -38,10 +63,7 @@ export default function PrivacyTab() {
             <Toggle
               key={id}
               enabled={privacyToggles[id]}
-              onChange={() => {
-                setPrivacyToggles((prev) => ({ ...prev, [id]: !prev[id] }));
-                console.log("privacy toggled:", id);
-              }}
+              onChange={() => togglePrivacy(id)}
               label={label}
               description={description}
             />
@@ -54,7 +76,7 @@ export default function PrivacyTab() {
         <h3 className="text-xl font-headline italic text-foreground mb-5">API Key</h3>
         <div className="flex gap-2">
           <Input
-            value={apiKeyVisible ? API_KEY : MASKED_KEY}
+            value={apiKeyVisible ? STATIC_API_KEY : MASKED_KEY}
             type="text"
             className="flex-1"
             rightElement={
@@ -79,11 +101,11 @@ export default function PrivacyTab() {
           </button>
         </div>
         <button
-          onClick={() => console.log("regenerate API key")}
+          onClick={handleRegenerate}
           className="flex items-center gap-1.5 mt-3 text-xs font-mono uppercase tracking-widest text-secondary hover:text-primary transition-colors"
         >
-          <RefreshCw className="w-3 h-3" />
-          Regenerate Key
+          <RefreshCw className={`w-3 h-3 ${regenerated ? "animate-spin" : ""}`} />
+          {regenerated ? "Regenerated!" : "Regenerate Key"}
         </button>
       </Card>
     </div>

@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Copy, Check, Trash2, BarChart2 } from "lucide-react";
 import Badge from "../shared/ui/Badge";
 
-const BASE_URL = "snip.ly";
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+const BASE_URL = SERVER_BASE.replace(/^https?:\/\//, "");
 
 function getStatus(link) {
   if (!link.expiresAt) return "noExpiry";
@@ -23,7 +24,7 @@ export default function TableRow({ link, onDelete }) {
   const statusVariant = getStatus(link);
 
   function handleCopy() {
-    navigator.clipboard.writeText(`https://${BASE_URL}/${link.shortCode}`);
+    navigator.clipboard.writeText(`${SERVER_BASE}/${link.shortCode}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
