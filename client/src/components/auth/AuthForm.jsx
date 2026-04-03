@@ -20,7 +20,7 @@ function getStrength(pw) {
 }
 
 /** variant = "login" | "register" */
-export default function AuthForm({ variant = "login", onSubmit }) {
+export default function AuthForm({ variant = "login", onSubmit, apiError, loading }) {
   const isLogin = variant === "login";
 
   const [form, setForm] = useState({
@@ -181,6 +181,13 @@ export default function AuthForm({ variant = "login", onSubmit }) {
           </div>
         )}
 
+        {/* API error */}
+        {apiError && (
+          <p className="text-xs text-error font-mono uppercase tracking-widest text-center">
+            {apiError}
+          </p>
+        )}
+
         {/* Submit + Google */}
         <div className="flex flex-col gap-4 pt-2">
           <Button
@@ -188,8 +195,9 @@ export default function AuthForm({ variant = "login", onSubmit }) {
             variant="primary"
             size="lg"
             className="w-full justify-between group"
+            disabled={loading}
           >
-            <span>{isLogin ? "Sign In" : "Create Account"}</span>
+            <span>{loading ? (isLogin ? "Signing In…" : "Creating…") : (isLogin ? "Sign In" : "Create Account")}</span>
             <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Button>
 

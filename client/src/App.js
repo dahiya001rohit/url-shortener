@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import Navbar from "./components/layout/Navbar";
 import LandingPage from "./Pages/LandingPage";
 import LoginPage from "./Pages/LoginPage";
@@ -10,6 +11,7 @@ import ProfilePage from "./Pages/ProfilePage";
 import SettingsPage from "./Pages/SettingsPage";
 import "./index.css";
 import Footer from "./components/layout/Footer";
+import { useAuth } from "./context/AuthContext";
 
 // Landing page — navbar + footer
 function MainLayout({ children }) {
@@ -35,6 +37,27 @@ function AppLayout({ children }) {
 
 function AuthLayout({ children }) {
   return <>{children}</>;
+}
+
+function ProtectedRoute({ children }) {
+  const { isLoggedIn, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      navigate("/login");
+    }
+  }, [isLoggedIn, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-secondary font-mono text-xs uppercase tracking-widest">Loading…</p>
+      </div>
+    );
+  }
+  if (!isLoggedIn) return null;
+  return children;
 }
 
 export default function App() {
@@ -68,41 +91,51 @@ export default function App() {
         <Route
           path="/dashboard"
           element={
-            <AppLayout>
-              <DashboardPage />
-            </AppLayout>
+            <ProtectedRoute>
+              <AppLayout>
+                <DashboardPage />
+              </AppLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/analytics/:shortCode"
           element={
-            <AppLayout>
-              <AnalyticsPage />
-            </AppLayout>
+            <ProtectedRoute>
+              <AppLayout>
+                <AnalyticsPage />
+              </AppLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/home"
           element={
-            <AppLayout>
-              <HomePage />
-            </AppLayout>
+            <ProtectedRoute>
+              <AppLayout>
+                <HomePage />
+              </AppLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/profile"
           element={
-            <AppLayout>
-              <ProfilePage />
-            </AppLayout>
+            <ProtectedRoute>
+              <AppLayout>
+                <ProfilePage />
+              </AppLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/settings"
           element={
-            <AppLayout>
-              <SettingsPage />
-            </AppLayout>
+            <ProtectedRoute>
+              <AppLayout>
+                <SettingsPage />
+              </AppLayout>
+            </ProtectedRoute>
           }
         />
       </Routes>

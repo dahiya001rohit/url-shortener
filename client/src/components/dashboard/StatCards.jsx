@@ -1,7 +1,7 @@
 import { Link2, MousePointerClick, CheckCircle2, XCircle } from "lucide-react";
 import StatCard from "../shared/layout/StatCard";
 
-export default function StatCards({ stats }) {
+export default function StatCards({ stats = {} }) {
   const total = stats.totalLinks || 1;
   const activePercent = Math.round((stats.activeLinks / total) * 100);
   const expiredPercent = Math.round((stats.expiredLinks / total) * 100);

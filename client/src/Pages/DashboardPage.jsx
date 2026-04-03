@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -14,57 +14,7 @@ import StatCards from "../components/dashboard/StatCards";
 import SearchFilters from "../components/dashboard/SearchFilters";
 import LinksTable from "../components/dashboard/LinksTable";
 import NewSnipModal from "../components/dashboard/NewSnipModal";
-
-// ─── Seed data ─────────────────────────────────────────────────────────────────
-const FAKE_DATA = [
-  {
-    _id: "1",
-    originalUrl: "https://www.notion.so/my-workspace/product-roadmap-2026",
-    shortCode: "prd-26",
-    userId: "user1",
-    clicks: 1284,
-    createdAt: "2026-01-15T10:30:00Z",
-    expiresAt: "2026-12-31T00:00:00Z", // Active (future)
-  },
-  {
-    _id: "2",
-    originalUrl: "https://figma.com/file/abc123/design-system-v2",
-    shortCode: "ds-v2",
-    userId: "user1",
-    clicks: 847,
-    createdAt: "2026-02-03T14:22:00Z",
-    // No expiry
-  },
-  {
-    _id: "3",
-    originalUrl:
-      "https://github.com/rohitdahiya/url-shortener/blob/main/README.md",
-    shortCode: "snip-gh",
-    userId: "user1",
-    clicks: 312,
-    createdAt: "2025-03-10T09:15:00Z",
-    expiresAt: "2025-06-30T00:00:00Z", // Expired
-  },
-  {
-    _id: "4",
-    originalUrl: "https://www.loom.com/share/product-demo-walkthrough-final",
-    shortCode: "demo-lm",
-    userId: "user1",
-    clicks: 2401,
-    createdAt: "2026-01-28T16:45:00Z",
-    // No expiry
-  },
-  {
-    _id: "5",
-    originalUrl:
-      "https://linear.app/team/project/sprint-42-retrospective-notes",
-    shortCode: "sprt-42",
-    userId: "user1",
-    clicks: 56,
-    createdAt: "2025-04-01T11:00:00Z",
-    expiresAt: "2025-05-01T00:00:00Z", // Expired
-  },
-];
+import api from "../services/api";
 
 // ─── Sidebar nav items ─────────────────────────────────────────────────────────
 const NAV_ITEMS = [
@@ -82,11 +32,25 @@ function getLinkStatus(link) {
 
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const [links, setLinks] = useState(FAKE_DATA);
+  const [links, setLinks] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loadingLinks, setLoadingLinks] = useState(true);
   const navigate = useNavigate();
+
+  const fetchLinks = useCallback(async () => {
+    try {
+      const { data } = await api.get("/url/my-urls");
+      setLinks(data);
+    } catch (err) {
+      console.error("Failed to fetch links", err);
+    } finally {
+      setLoadingLinks(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchLinks(); }, [fetchLinks]);
 
   // ── Derived stats ────────────────────────────────────────────────────────────
   const stats = useMemo(() => {
@@ -94,7 +58,7 @@ export default function DashboardPage() {
     const expired = links.filter((l) => getLinkStatus(l) === "Expired").length;
     return {
       totalLinks: links.length,
-      totalClicks: links.reduce((sum, l) => sum + l.clicks, 0),
+      totalClicks: links.reduce((sum, l) => sum + (l.clicks || 0), 0),
       activeLinks: active,
       expiredLinks: expired,
     };
@@ -122,21 +86,36 @@ export default function DashboardPage() {
   }, [links, search, filter]);
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
-  function handleDelete(id) {
-    setLinks((prev) => prev.filter((l) => l._id !== id));
+  async function handleDelete(id) {
+    try {
+      await api.delete(`/url/${id}`);
+      setLinks((prev) => prev.filter((l) => l._id !== id));
+    } catch (err) {
+      console.error("Failed to delete link", err);
+    }
   }
 
-  function handleNewSnip({ originalUrl, customAlias, expiresAt }) {
-    const newLink = {
-      _id: String(Date.now()),
-      originalUrl,
-      shortCode: customAlias || Math.random().toString(36).slice(2, 8),
-      userId: "user1",
-      clicks: 0,
-      createdAt: new Date().toISOString(),
-      expiresAt: expiresAt || undefined,
-    };
-    setLinks((prev) => [newLink, ...prev]);
+  async function handleNewSnip({ originalUrl, customAlias, expiresAt }) {
+    try {
+      const { data } = await api.post("/url/shorten", {
+        originalUrl,
+        ...(customAlias && { customAlias }),
+        ...(expiresAt && { expiresAt }),
+      });
+      setLinks((prev) => [
+        {
+          _id: data._id || String(Date.now()),
+          originalUrl: data.originalUrl,
+          shortCode: data.shortCode,
+          clicks: 0,
+          createdAt: new Date().toISOString(),
+          expiresAt: data.expiresAt || undefined,
+        },
+        ...prev,
+      ]);
+    } catch (err) {
+      console.error("Failed to create snip", err);
+    }
   }
 
   return (
@@ -166,12 +145,12 @@ export default function DashboardPage() {
 
         {/* Bottom actions */}
         <div className="border-t border-outline-variant/20 pt-4 space-y-1">
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-body text-secondary hover:bg-surface-container hover:text-foreground transition-colors">
+          <button onClick={() => navigate("/settings")} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-body text-secondary hover:bg-surface-container hover:text-foreground transition-colors">
             <Settings className="w-4 h-4 shrink-0" />
             Settings
           </button>
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/profile")}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-body text-secondary hover:bg-surface-container hover:text-foreground transition-colors"
           >
             <User className="w-4 h-4 shrink-0" />
@@ -197,11 +176,17 @@ export default function DashboardPage() {
             onFilter={setFilter}
           />
 
-          <LinksTable
-            links={filtered}
-            onDelete={handleDelete}
-            onNewSnip={() => setIsModalOpen(true)}
-          />
+          {loadingLinks ? (
+            <div className="py-20 text-center text-secondary font-mono text-xs uppercase tracking-widest">
+              Loading…
+            </div>
+          ) : (
+            <LinksTable
+              links={filtered}
+              onDelete={handleDelete}
+              onNewSnip={() => setIsModalOpen(true)}
+            />
+          )}
         </div>
       </main>
 

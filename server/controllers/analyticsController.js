@@ -63,29 +63,30 @@ export async function getUrlAnalytics(req, res, next) {
     ]);
 
     const uniqueVisitors = uniqueVisitorDocs.length;
-    const daysSinceCreated = Math.max(
-      1,
-      Math.ceil((Date.now() - new Date(url.createdAt).getTime()) / 86400000)
-    );
-    const avgPerDay = parseFloat((totalClicks / daysSinceCreated).toFixed(2));
-    const clickRate = totalClicks > 0 ? parseFloat(((uniqueVisitors / totalClicks) * 100).toFixed(1)) : 0;
+    const avgPerDay = Math.round(totalClicks / 7);
+    const clickRate = uniqueVisitors > 0
+      ? ((totalClicks / uniqueVisitors) * 100).toFixed(1)
+      : "0.0";
 
     res.json({
-      link: {
-        originalUrl: url.originalUrl,
-        shortCode: url.shortCode,
-        createdAt: url.createdAt,
-        expiresAt: url.expiresAt || null,
-      },
       totalClicks,
       uniqueVisitors,
-      avgPerDay,
       clickRate,
+      avgPerDay,
       clicksPerDay,
       topCountries,
       deviceBreakdown,
       browserBreakdown,
       topReferrers,
+      link: {
+        originalUrl: url.originalUrl,
+        shortCode: url.shortCode,
+        createdAt: url.createdAt,
+        expiresAt: url.expiresAt || null,
+        clicks: url.clicks,
+        status: url.expiresAt && new Date(url.expiresAt) < new Date()
+          ? "expired" : "active",
+      },
     });
   } catch (err) {
     next(err);

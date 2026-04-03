@@ -3,7 +3,7 @@ import { Download, Trash2, AlertTriangle } from "lucide-react";
 import Card from "../shared/ui/Card";
 import Button from "../shared/ui/Button";
 
-export default function DangerZone() {
+export default function DangerZone({ onDelete }) {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
 
   return (
@@ -48,7 +48,7 @@ export default function DangerZone() {
                 variant="destructive"
                 size="sm"
                 className="flex-1"
-                onClick={() => console.log("delete account confirmed")}
+                onClick={() => { setDeleteConfirm(false); onDelete?.(); }}
               >
                 Yes, delete everything
               </Button>

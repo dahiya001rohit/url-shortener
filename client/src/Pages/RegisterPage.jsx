@@ -1,12 +1,31 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import AuthShell from "../components/auth/AuthShell";
 import AuthLeftPanel from "../components/auth/AuthLeftPanel";
 import AuthForm from "../components/auth/AuthForm";
+import { useAuth } from "../context/AuthContext";
 
 export default function RegisterPage() {
-  const handleSubmit = (values) => {
-    console.log("register", values);
+  const { register, login } = useAuth();
+  const navigate = useNavigate();
+  const [apiError, setApiError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async ({ name, email, password, confirmPassword, terms }) => {
+    if (password !== confirmPassword) return;
+    if (!terms) { setApiError("You must accept the terms to continue."); return; }
+    setApiError("");
+    setLoading(true);
+    try {
+      await register(name, email, password);
+      await login(email, password);
+      navigate("/home");
+    } catch (err) {
+      setApiError(err.response?.data?.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,7 +43,7 @@ export default function RegisterPage() {
         </nav>
 
         <div className="flex-1 flex items-center justify-center">
-          <AuthForm variant="register" onSubmit={handleSubmit} />
+          <AuthForm variant="register" onSubmit={handleSubmit} apiError={apiError} loading={loading} />
         </div>
 
         <footer className="pt-8 text-[10px] font-mono uppercase tracking-widest text-outline/40 text-center">

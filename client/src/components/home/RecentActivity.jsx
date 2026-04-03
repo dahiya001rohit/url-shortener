@@ -1,45 +1,30 @@
 import { Link } from "react-router-dom";
-import { MousePointer2, BarChart2, AlertTriangle, Link2, TrendingUp } from "lucide-react";
+import { MousePointer2, Link2, AlertTriangle } from "lucide-react";
 
-const ACTIVITY_DATA = [
-  {
-    icon: MousePointer2,
-    iconBg: "bg-primary/10",
-    iconColor: "text-primary",
-    text: "snip.ly/design-q3 received 142 clicks",
-    time: "2 min ago",
-  },
-  {
-    icon: BarChart2,
-    iconBg: "bg-accent/10",
-    iconColor: "text-accent",
-    text: "Weekly summary: 3,421 total clicks across 12 links",
-    time: "1 hr ago",
-  },
-  {
-    icon: AlertTriangle,
-    iconBg: "bg-error/10",
-    iconColor: "text-error",
-    text: "snip.ly/conf-2023 expires in 3 days",
-    time: "3 hr ago",
-  },
-  {
-    icon: Link2,
-    iconBg: "bg-primary/10",
-    iconColor: "text-primary",
-    text: "New snip created: snip.ly/arch-daily",
-    time: "Yesterday",
-  },
-  {
-    icon: TrendingUp,
-    iconBg: "bg-accent/10",
-    iconColor: "text-accent",
-    text: "Traffic surge detected on snip.ly/figma-kit — +240%",
-    time: "2 days ago",
-  },
-];
+const ICON_MAP = {
+  MousePointer2,
+  Link2,
+  AlertTriangle,
+};
 
-export default function RecentActivity() {
+const ICON_STYLE = {
+  click_milestone: { bg: "bg-primary/10", color: "text-primary" },
+  new_link:        { bg: "bg-accent/10",  color: "text-accent"  },
+  expiry_warning:  { bg: "bg-error/10",   color: "text-error"   },
+};
+
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
+}
+
+export default function RecentActivity({ activity = [] }) {
   return (
     <div
       className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6 h-full"
@@ -63,19 +48,22 @@ export default function RecentActivity() {
       </div>
 
       <div className="space-y-4">
-        {ACTIVITY_DATA.map((item, i) => {
-          const Icon = item.icon;
+        {activity.length === 0 ? (
+          <p className="text-xs text-secondary font-mono">No recent activity yet.</p>
+        ) : activity.map((item, i) => {
+          const Icon = ICON_MAP[item.icon] || Link2;
+          const style = ICON_STYLE[item.type] || ICON_STYLE.new_link;
           return (
             <div key={i} className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${item.iconBg}`}>
-                <Icon className={`w-4 h-4 ${item.iconColor}`} />
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${style.bg}`}>
+                <Icon className={`w-4 h-4 ${style.color}`} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-body text-foreground leading-snug">
-                  {item.text}
+                  {item.message}
                 </p>
                 <p className="text-xs font-mono text-outline mt-0.5">
-                  {item.time}
+                  {timeAgo(item.time)}
                 </p>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ProfileCard from "../components/profile/ProfileCard";
 import ProfileSidebar from "../components/profile/ProfileSidebar";
 import PersonalInfoForm from "../components/profile/PersonalInfoForm";
@@ -8,18 +9,43 @@ import PreferencesSection from "../components/profile/PreferencesSection";
 import AccountOverview from "../components/profile/AccountOverview";
 import DangerZone from "../components/profile/DangerZone";
 import PageHeader from "../components/shared/layout/PageHeader";
-
-const user = {
-  name: "Rohit Kumar",
-  email: "rohit@example.com",
-  totalLinks: 24,
-  totalClicks: 48291,
-  memberSince: "Mar 2026",
-  plan: "Free",
-};
+import { useAuth } from "../context/AuthContext";
+import api from "../services/api";
 
 export default function ProfilePage() {
+  const { user, updateUser, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
+  const [urlStats] = useState({ totalLinks: 0, totalClicks: 0 });
+
+  const profileUser = {
+    name: user?.name || "",
+    email: user?.email || "",
+    totalLinks: user?.totalLinks ?? urlStats.totalLinks,
+    totalClicks: user?.totalClicks ?? urlStats.totalClicks,
+    memberSince: user?.memberSince
+      ? new Date(user.memberSince).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+      : "—",
+    plan: user?.plan || "Free",
+  };
+
+  async function handleSave(formData) {
+    const { data } = await api.patch("/user/profile", {
+      name: formData.name,
+      email: formData.email,
+    });
+    updateUser({ name: data.name, email: data.email });
+  }
+
+  async function handleChangePassword(currentPassword, newPassword) {
+    await api.patch("/user/password", { currentPassword, newPassword });
+  }
+
+  async function handleDeleteAccount() {
+    await api.delete("/user/account");
+    await logout();
+    navigate("/");
+  }
 
   return (
     <div className="bg-background min-h-screen">
@@ -32,12 +58,14 @@ export default function ProfilePage() {
           </div>
 
           <div className="col-span-7 space-y-4">
-            <ProfileCard user={user} />
+            <ProfileCard user={profileUser} />
 
             {activeTab === "profile" && (
-              <PersonalInfoForm user={user} onSave={console.log} />
+              <PersonalInfoForm user={profileUser} onSave={handleSave} />
             )}
-            {activeTab === "security" && <SecurityForm />}
+            {activeTab === "security" && (
+              <SecurityForm onChangePassword={handleChangePassword} />
+            )}
             {activeTab === "billing" && <BillingSection />}
             {activeTab === "preferences" && <PreferencesSection />}
           </div>
@@ -45,13 +73,13 @@ export default function ProfilePage() {
           <div className="col-span-3 space-y-4">
             <AccountOverview
               stats={{
-                totalLinks: user.totalLinks,
-                totalClicks: user.totalClicks,
-                memberSince: user.memberSince,
-                plan: user.plan,
+                totalLinks: profileUser.totalLinks,
+                totalClicks: profileUser.totalClicks,
+                memberSince: profileUser.memberSince,
+                plan: profileUser.plan,
               }}
             />
-            <DangerZone />
+            <DangerZone onDelete={handleDeleteAccount} />
           </div>
         </div>
       </div>

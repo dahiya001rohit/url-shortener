@@ -8,16 +8,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const clickData = [
-  { date: "Mon", clicks: 987 },
-  { date: "Tue", clicks: 1243 },
-  { date: "Wed", clicks: 891 },
-  { date: "Thu", clicks: 1567 },
-  { date: "Fri", clicks: 2103 },
-  { date: "Sat", clicks: 1876 },
-  { date: "Sun", clicks: 1815 },
-];
-
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload || !payload.length) return null;
   return (
@@ -33,7 +23,16 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
-export default function ClickChart() {
+export default function ClickChart({ data = [] }) {
+  const chartData = data.map((d) => ({
+    date: d._id
+      ? new Date(d._id).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+      : d.date,
+    clicks: d.count ?? d.clicks ?? 0,
+  }));
+
+  const totalThisPeriod = chartData.reduce((s, d) => s + d.clicks, 0);
+
   return (
     <div
       className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6"
@@ -50,17 +49,18 @@ export default function ClickChart() {
         </div>
         <div className="text-right">
           <p className="text-xs font-mono uppercase tracking-widest text-secondary">
-            Thu Oct 12
+            This Period
           </p>
-          <p className="text-lg font-headline text-primary">1,242 clicks</p>
-          <p className="text-xs font-mono text-primary/70">+24%</p>
+          <p className="text-lg font-headline text-primary">
+            {totalThisPeriod.toLocaleString()} clicks
+          </p>
         </div>
       </div>
 
       <div style={{ width: "100%", height: "320px" }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={clickData}
+            data={chartData}
             margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
           >
             <defs>
@@ -85,7 +85,7 @@ export default function ClickChart() {
               tick={{ fontFamily: "Geist Mono", fontSize: 11, fill: "#5F5E5E" }}
               axisLine={false}
               tickLine={false}
-              tickFormatter={(v) => `${(v / 1000).toFixed(1)}k`}
+              tickFormatter={(v) => v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}
             />
             <Tooltip content={<CustomTooltip />} />
             <Area

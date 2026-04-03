@@ -1,11 +1,10 @@
-const browserData = [
-  { browser: "Chrome", value: 62 },
-  { browser: "Safari", value: 24 },
-  { browser: "Firefox", value: 9 },
-  { browser: "Edge", value: 5 },
-];
+export default function BrowserChart({ data = [] }) {
+  const total = data.reduce((s, d) => s + d.count, 0) || 1;
+  const browsers = data.map((d) => ({
+    browser: d._id || "Unknown",
+    value: Math.round((d.count / total) * 100),
+  }));
 
-export default function BrowserChart() {
   return (
     <div
       className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6"
@@ -19,7 +18,9 @@ export default function BrowserChart() {
       </p>
 
       <div className="space-y-3">
-        {browserData.map((item) => (
+        {browsers.length === 0 ? (
+          <p className="text-xs text-secondary font-mono">No data yet</p>
+        ) : browsers.map((item) => (
           <div key={item.browser}>
             <div className="flex justify-between mb-1">
               <span className="font-mono text-xs text-secondary">

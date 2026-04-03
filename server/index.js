@@ -7,7 +7,9 @@ import healthRouter from "./routes/health.js";
 import authRouter from "./routes/authRoutes.js";
 import urlRouter from "./routes/urlRoutes.js";
 import analyticsRouter from "./routes/analyticsRoutes.js";
-import { redirectUrl } from "./controllers/urlController.js";
+import userRouter from "./routes/userRoutes.js";
+import { redirectUrl, getRecentActivity } from "./controllers/urlController.js";
+import { authenticate } from "./middleware/auth.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
@@ -15,15 +17,20 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(globalLimiter);
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:3001"],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/auth", authRouter);
 app.use("/api/url", urlRouter);
 app.use("/api/analytics", analyticsRouter);
+app.use("/api/user", userRouter);
 app.use("/api/health", healthRouter);
 
+app.get("/api/activity/recent", authenticate, getRecentActivity);
 app.get("/:shortCode", redirectUrl);
 
 app.use(errorHandler);

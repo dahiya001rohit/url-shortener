@@ -1,12 +1,28 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import AuthShell from "../components/auth/AuthShell";
 import AuthLeftPanel from "../components/auth/AuthLeftPanel";
 import AuthForm from "../components/auth/AuthForm";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
-  const handleSubmit = (values) => {
-    console.log("login", values);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [apiError, setApiError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async ({ email, password }) => {
+    setApiError("");
+    setLoading(true);
+    try {
+      await login(email, password);
+      navigate("/home");
+    } catch (err) {
+      setApiError(err.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -24,7 +40,7 @@ export default function LoginPage() {
         </nav>
 
         <div className="flex-1 flex items-center justify-center">
-          <AuthForm variant="login" onSubmit={handleSubmit} />
+          <AuthForm variant="login" onSubmit={handleSubmit} apiError={apiError} loading={loading} />
         </div>
 
         <footer className="pt-8 text-[10px] font-mono uppercase tracking-widest text-outline/40 text-center">

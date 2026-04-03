@@ -5,14 +5,17 @@ export default function QuickSnipCard({ onSnip }) {
   const [url, setUrl] = useState("");
   const [result, setResult] = useState(null); // { shortCode }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (!url.trim()) return;
-    const shortCode = Math.random().toString(36).slice(2, 8);
-    onSnip?.(url);
-    setResult({ shortCode });
-    setUrl("");
-    setTimeout(() => setResult(null), 3000);
+    try {
+      const data = await onSnip?.(url);
+      setResult({ shortCode: data?.shortCode || "—" });
+      setUrl("");
+      setTimeout(() => setResult(null), 3000);
+    } catch {
+      // onSnip throws → show nothing special
+    }
   }
 
   return (

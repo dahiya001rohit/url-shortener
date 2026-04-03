@@ -38,7 +38,7 @@ function PasswordField({ id, label, value, onChange, show, onToggle }) {
   );
 }
 
-export default function SecurityForm() {
+export default function SecurityForm({ onChangePassword }) {
   const [fields, setFields] = useState({
     currentPassword: "",
     newPassword: "",
@@ -46,6 +46,8 @@ export default function SecurityForm() {
   });
   const [show, setShow] = useState({ current: false, new: false, confirm: false });
   const [twoFA, setTwoFA] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
 
   const strength = getStrength(fields.newPassword);
 
@@ -118,11 +120,31 @@ export default function SecurityForm() {
           )}
         </div>
 
+        {error && (
+          <p className="text-[10px] text-error font-mono uppercase tracking-widest mt-3">{error}</p>
+        )}
+        {success && (
+          <p className="text-[10px] text-primary font-mono uppercase tracking-widest mt-3">Password updated!</p>
+        )}
         <Button
           variant="primary"
           size="sm"
           className="mt-5"
-          onClick={() => console.log("update password", fields)}
+          onClick={async () => {
+            if (fields.newPassword !== fields.confirmPassword) {
+              setError("Passwords do not match");
+              return;
+            }
+            setError("");
+            setSuccess(false);
+            try {
+              await onChangePassword?.(fields.currentPassword, fields.newPassword);
+              setFields({ currentPassword: "", newPassword: "", confirmPassword: "" });
+              setSuccess(true);
+            } catch (err) {
+              setError(err.response?.data?.message || "Failed to update password");
+            }
+          }}
         >
           Update Password
         </Button>

@@ -1,12 +1,26 @@
-const countryData = [
-  { flag: "🇮🇳", name: "India", count: 4281, pct: 42 },
-  { flag: "🇺🇸", name: "United States", count: 3102, pct: 28 },
-  { flag: "🇬🇧", name: "United Kingdom", count: 1490, pct: 11 },
-  { flag: "🇩🇪", name: "Germany", count: 821, pct: 9 },
-  { flag: "🇨🇦", name: "Canada", count: 821, pct: 10 },
-];
+const COUNTRY_NAMES = {
+  IN: { name: "India", flag: "🇮🇳" },
+  US: { name: "United States", flag: "🇺🇸" },
+  GB: { name: "United Kingdom", flag: "🇬🇧" },
+  DE: { name: "Germany", flag: "🇩🇪" },
+  CA: { name: "Canada", flag: "🇨🇦" },
+  AU: { name: "Australia", flag: "🇦🇺" },
+  FR: { name: "France", flag: "🇫🇷" },
+  JP: { name: "Japan", flag: "🇯🇵" },
+  BR: { name: "Brazil", flag: "🇧🇷" },
+  SG: { name: "Singapore", flag: "🇸🇬" },
+  NL: { name: "Netherlands", flag: "🇳🇱" },
+  PK: { name: "Pakistan", flag: "🇵🇰" },
+  Unknown: { name: "Unknown", flag: "🌐" },
+};
 
-export default function CountryList() {
+export default function CountryList({ data = [] }) {
+  const total = data.reduce((s, d) => s + d.count, 0) || 1;
+  const countries = data.map((d) => {
+    const info = COUNTRY_NAMES[d._id] || { name: d._id || "Unknown", flag: "🌐" };
+    return { ...info, count: d.count, pct: Math.round((d.count / total) * 100) };
+  });
+
   return (
     <div
       className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6"
@@ -20,7 +34,9 @@ export default function CountryList() {
       </p>
 
       <div className="space-y-4">
-        {countryData.map((c) => (
+        {countries.length === 0 ? (
+          <p className="text-xs text-secondary font-mono">No data yet</p>
+        ) : countries.map((c) => (
           <div key={c.name}>
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">

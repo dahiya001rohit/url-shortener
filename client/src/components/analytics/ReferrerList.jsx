@@ -1,11 +1,11 @@
-const referrerData = [
-  { source: "Direct / Email", url: "snip.ly/direct", count: 5102, pct: 41 },
-  { source: "Twitter / X", url: "t.co", count: 2482, pct: 20 },
-  { source: "LinkedIn", url: "linkedin.com/feed", count: 1921, pct: 15 },
-  { source: "Instagram", url: "instagram.com", count: 1204, pct: 10 },
-];
+export default function ReferrerList({ data = [] }) {
+  const total = data.reduce((s, d) => s + d.count, 0) || 1;
+  const referrers = data.map((d) => ({
+    source: d._id || "Direct",
+    count: d.count,
+    pct: Math.round((d.count / total) * 100),
+  }));
 
-export default function ReferrerList() {
   return (
     <div
       className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl p-6"
@@ -19,13 +19,14 @@ export default function ReferrerList() {
       </p>
 
       <div className="space-y-4">
-        {referrerData.map((r) => (
+        {referrers.length === 0 ? (
+          <p className="text-xs text-secondary font-mono">No data yet</p>
+        ) : referrers.map((r) => (
           <div key={r.source} className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-sm font-body font-medium text-foreground truncate">
                 {r.source}
               </p>
-              <p className="text-xs font-mono text-secondary truncate">{r.url}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <span className="text-sm font-mono text-foreground">

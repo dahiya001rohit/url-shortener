@@ -1,4 +1,4 @@
-export default function GreetingHeader() {
+export default function GreetingHeader({ name = "there" }) {
   const hour = new Date().getHours();
   const greeting =
     hour >= 5 && hour < 12
@@ -21,7 +21,7 @@ export default function GreetingHeader() {
           {greeting}
         </p>
         <p className="text-3xl font-headline italic leading-tight" style={{ color: "#FFB95F" }}>
-          Rohit.
+          {name.split(" ")[0]}.
         </p>
       </div>
       <span className="font-mono text-sm text-outline pt-1">{dateStr}</span>

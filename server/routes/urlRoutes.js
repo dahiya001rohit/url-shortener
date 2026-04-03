@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { shortenUrl, getMyUrls, deleteUrl } from "../controllers/urlController.js";
+import {
+  shortenUrl, getMyUrls, deleteUrl, editUrl, getStats, getRecentActivity,
+} from "../controllers/urlController.js";
 import { authenticate } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 import { shortenLimiter } from "../middleware/rateLimiter.js";
@@ -15,6 +17,11 @@ router.post(
   shortenUrl
 );
 router.get("/my-urls", authenticate, getMyUrls);
+router.get("/stats", authenticate, getStats);
+router.patch("/:id", authenticate, editUrl);
 router.delete("/:id", authenticate, deleteUrl);
+
+// Activity endpoint — mounted at /api/activity
+export { getRecentActivity };
 
 export default router;
