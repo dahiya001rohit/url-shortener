@@ -97,7 +97,7 @@ export default function DemoAnalyticsPage() {
       <DemoBanner />
 
       <div className="pt-10">
-        <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
+        <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16 pt-28 pb-24">
           {/* Back to demo */}
           <button
             onClick={() => navigate("/demo")}
@@ -131,7 +131,7 @@ export default function DemoAnalyticsPage() {
 
           <ClickChart data={DEMO_ANALYTICS.clicksPerDay} />
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
             <DeviceChart data={DEMO_ANALYTICS.deviceBreakdown} />
             <CountryList data={DEMO_ANALYTICS.topCountries} />
             <ReferrerList data={DEMO_ANALYTICS.topReferrers} />

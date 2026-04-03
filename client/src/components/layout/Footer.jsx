@@ -16,8 +16,8 @@ const FOOTER_LINKS = {
 export function Footer() {
   return (
     <footer className="bg-[#1a1c1c] w-full pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-8 mb-16 h-px bg-gradient-to-r from-transparent via-[#FFB95F]/20 to-transparent" />
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-12 max-w-7xl mx-auto px-8">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16 mb-16 h-px bg-gradient-to-r from-transparent via-[#FFB95F]/20 to-transparent" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16">
         <div className="col-span-2 md:col-span-1">
           <span className="font-headline italic text-2xl text-amber-200">Snip</span>
           <p className="mt-6 text-emerald-50/50 font-mono text-xs uppercase tracking-widest leading-relaxed">
@@ -41,7 +41,7 @@ export function Footer() {
           </div>
         ))}
       </div>
-      <div className="max-w-7xl mx-auto px-8 mt-24 pt-8 border-t border-white/5 text-center">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16 mt-24 pt-8 border-t border-white/5 text-center">
         <span className="text-emerald-50/20 font-mono text-[10px] uppercase tracking-[0.4em]">
           Curated Connections — Made Precise
         </span>

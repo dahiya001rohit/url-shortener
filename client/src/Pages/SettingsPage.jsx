@@ -28,15 +28,15 @@ export default function SettingsPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
+      <div className="w-full max-w-[1200px] mx-auto px-6 lg:px-10 xl:px-16 pt-28 pb-24">
         <PageHeader
           label="Settings"
           heading="Preferences."
           subtext="Customize your Snip experience."
         />
 
-        <div className="grid grid-cols-12 gap-8 mt-10">
-          <div className="col-span-2">
+        <div className="grid grid-cols-12 gap-6 lg:gap-8 mt-10">
+          <div className="col-span-full lg:col-span-2">
             <SidebarNav
               tabs={SETTINGS_TABS}
               activeTab={activeTab}
@@ -44,7 +44,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="col-span-7">
+          <div className="col-span-full lg:col-span-7">
             {activeTab === "appearance" && <AppearanceTab />}
             {activeTab === "notifications" && <NotificationsTab />}
             {activeTab === "links" && <LinksTab />}
@@ -52,7 +52,7 @@ export default function SettingsPage() {
             {activeTab === "integrations" && <IntegrationsTab />}
           </div>
 
-          <div className="col-span-3 space-y-4">
+          <div className="col-span-full lg:col-span-3 space-y-4">
             <Card>
               <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
                 Summary

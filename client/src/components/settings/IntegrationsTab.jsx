@@ -49,7 +49,7 @@ export default function IntegrationsTab() {
     <Card>
       <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">Integrations</p>
       <h3 className="text-xl font-headline italic text-foreground mb-5">Connected Apps</h3>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {INTEGRATIONS.map(({ id, name, description, logo, logoColor, connectUrl }) => {
           const isConnected = connected[id];
           return (

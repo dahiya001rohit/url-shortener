@@ -57,7 +57,7 @@ export default function ClickChart({ data = [] }) {
         </div>
       </div>
 
-      <div style={{ width: "100%", height: "320px" }}>
+      <div style={{ width: "100%", height: "clamp(240px, 30vw, 320px)" }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={chartData}

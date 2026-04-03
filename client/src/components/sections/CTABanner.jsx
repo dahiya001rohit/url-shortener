@@ -23,7 +23,7 @@ export function CTABanner() {
         initial={{ opacity: 0, y: 30 }}
         animate={visible ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="max-w-4xl mx-auto relative z-10"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16 relative z-10"
       >
         <h2 className="font-headline italic text-6xl md:text-8xl text-primary mb-12 tracking-tighter">
           Ready to shorten?

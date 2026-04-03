@@ -20,7 +20,7 @@ export default function AnalyticsHeader({ shortCode, originalUrl, status, dateRa
         </span>
       </button>
 
-      <div className="flex items-start justify-between gap-4 flex-wrap">
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl font-headline italic text-foreground">

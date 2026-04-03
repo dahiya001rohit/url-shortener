@@ -47,15 +47,15 @@ export default function ProfilePage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
+      <div className="w-full max-w-[1200px] mx-auto px-6 lg:px-10 xl:px-16 pt-28 pb-24">
         <PageHeader label="Profile" heading="Your Account." />
 
-        <div className="grid grid-cols-12 gap-8 mt-10">
-          <div className="col-span-2">
+        <div className="grid grid-cols-12 gap-6 lg:gap-8 mt-10">
+          <div className="col-span-full lg:col-span-2">
             <ProfileSidebar activeTab={activeTab} onTabChange={setActiveTab} />
           </div>
 
-          <div className="col-span-7 space-y-4">
+          <div className="col-span-full lg:col-span-7 space-y-4">
             <ProfileCard user={profileUser} />
 
             {activeTab === "profile" && (
@@ -67,7 +67,7 @@ export default function ProfilePage() {
             {activeTab === "preferences" && <PreferencesSection />}
           </div>
 
-          <div className="col-span-3 space-y-4">
+          <div className="col-span-full lg:col-span-3 space-y-4">
             <AccountOverview
               stats={{
                 totalLinks: profileUser.totalLinks,

@@ -50,7 +50,7 @@ export function StatsBar() {
       className="bg-primary relative overflow-hidden py-24"
     >
       <div className="absolute inset-0 opacity-10 editorial-grid" />
-      <div className="max-w-7xl mx-auto px-8 relative z-10 grid md:grid-cols-3 gap-0 text-center">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16 relative z-10 grid grid-cols-1 sm:grid-cols-3 gap-0 text-center">
         {STATS.map((stat, i) => (
           <div
             key={stat.label}

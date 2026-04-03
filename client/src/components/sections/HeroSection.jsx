@@ -92,7 +92,7 @@ export function HeroSection() {
         </motion.div>
 
         {/* Headline */}
-        <h1 className="font-headline italic font-black text-[6rem] md:text-[11rem] leading-[0.85] text-primary tracking-tighter mb-8 flex flex-col items-center">
+        <h1 className="font-headline italic font-black text-[3rem] sm:text-[5rem] lg:text-[8rem] xl:text-[11rem] leading-none text-primary tracking-tighter mb-8 flex flex-col items-center">
           <motion.span variants={fadeUp} initial="hidden" animate="visible" custom={0.2} className="block">
             Shorten.
           </motion.span>
@@ -114,7 +114,7 @@ export function HeroSection() {
         </motion.p>
 
         {/* URL Input */}
-        <motion.div variants={scaleIn} initial="hidden" animate="visible" className="w-full max-w-2xl mx-auto mb-20">
+        <motion.div variants={scaleIn} initial="hidden" animate="visible" className="w-full max-w-full lg:max-w-3xl mx-auto mb-20">
           <div className="bg-white p-2 rounded-full shadow-2xl shadow-primary/5 flex items-center border border-outline-variant focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/5 transition-all duration-500">
             <div className="pl-6 flex items-center text-outline">
               <Link2 className="w-5 h-5" />
@@ -158,7 +158,7 @@ export function HeroSection() {
         </motion.div>
 
         {/* 3D Mockup */}
-        <motion.div variants={slideUp} initial="hidden" animate="visible" className="relative w-full max-w-4xl">
+        <motion.div variants={slideUp} initial="hidden" animate="visible" className="relative w-full max-w-full lg:max-w-5xl">
           <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full -z-10 transform scale-75" />
           <div className="mockup-3d bg-white rounded-xl border border-outline-variant shadow-[0_50px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden">
             {/* Browser Header */}

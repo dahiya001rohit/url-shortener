@@ -107,7 +107,7 @@ export default function AppearanceTab() {
       <Card>
         <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">Appearance</p>
         <h3 className="text-xl font-headline italic text-foreground mb-5">Theme Preference</h3>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {["light", "dark", "system"].map((t) => (
             <ThemeCard key={t} theme={t} isActive={theme === t} onClick={() => handleTheme(t)} />
           ))}

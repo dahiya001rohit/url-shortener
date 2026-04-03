@@ -45,13 +45,13 @@ export function FeaturesSection() {
   const [ref, visible] = useScrollReveal();
 
   return (
-    <section id="features" className="bg-surface-container-low py-32 px-6 overflow-hidden">
+    <section id="features" className="bg-surface-container-low py-32 overflow-hidden">
       <motion.div
         ref={ref}
         initial={{ opacity: 0, y: 30 }}
         animate={visible ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="max-w-7xl mx-auto"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16"
       >
         <h2 className="font-headline italic text-5xl md:text-7xl text-primary max-w-3xl mb-24 leading-[1.1]">
           Everything you need, nothing you don't.

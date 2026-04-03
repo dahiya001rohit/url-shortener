@@ -55,7 +55,7 @@ export default function AnalyticsPage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
+      <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16 pt-28 pb-24">
         <AnalyticsHeader
           shortCode={shortCode}
           originalUrl={analytics.link.originalUrl}
@@ -68,7 +68,7 @@ export default function AnalyticsPage() {
 
         <ClickChart data={analytics.clicksPerDay} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
           <DeviceChart data={analytics.deviceBreakdown} />
           <CountryList data={analytics.topCountries} />
           <ReferrerList data={analytics.topReferrers} />

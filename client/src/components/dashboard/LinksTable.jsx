@@ -8,25 +8,25 @@ export default function LinksTable({ links, onDelete, onNewSnip }) {
 
   return (
     <div
-      className="bg-surface-container-lowest rounded-xl overflow-hidden"
+      className="bg-surface-container-lowest rounded-xl overflow-x-auto"
       style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
     >
-      <table className="w-full">
+      <table className="min-w-[700px] w-full">
         <thead>
           <tr className="border-b border-outline-variant/20 bg-surface-container-low/50">
-            <th className="py-3 pl-4 pr-3 text-left text-xs font-mono uppercase tracking-widest text-secondary">
+            <th className="py-3 pl-4 pr-3 text-left text-xs font-mono uppercase tracking-widest text-secondary w-[220px]">
               Short Link
             </th>
             <th className="py-3 px-3 text-left text-xs font-mono uppercase tracking-widest text-secondary">
               Destination
             </th>
-            <th className="py-3 px-3 text-left text-xs font-mono uppercase tracking-widest text-secondary">
+            <th className="py-3 px-3 text-center text-xs font-mono uppercase tracking-widest text-secondary w-[100px]">
               Clicks
             </th>
-            <th className="py-3 px-3 text-left text-xs font-mono uppercase tracking-widest text-secondary">
+            <th className="py-3 px-3 text-center text-xs font-mono uppercase tracking-widest text-secondary w-[120px]">
               Status
             </th>
-            <th className="py-3 pl-3 pr-4 text-left text-xs font-mono uppercase tracking-widest text-secondary">
+            <th className="py-3 pl-3 pr-4 text-right text-xs font-mono uppercase tracking-widest text-secondary w-[120px]">
               Actions
             </th>
           </tr>

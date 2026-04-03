@@ -117,7 +117,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background flex">
       {/* ── Sidebar ────────────────────────────────────────────────────────── */}
-      <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-outline-variant/20 bg-surface-container-lowest left-0 top-0 bottom-0 pt-28 pb-6 px-3">
+      <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-outline-variant/20 bg-surface-container-lowest pt-28 pb-6 px-3">
         <nav className="flex-1 space-y-1">
           {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
             const isActive =
@@ -156,8 +156,8 @@ export default function DashboardPage() {
       </aside>
 
       {/* ── Main content ───────────────────────────────────────────────────── */}
-      <main className="flex-1 pt-28 pb-16 px-6 lg:px-10">
-        <div className="max-w-5xl mx-auto">
+      <main className="flex-1 pt-28 pb-16 px-6 lg:px-10 xl:px-16 min-w-0">
+        <div className="w-full max-w-[1400px] mx-auto">
           <PageHeader
             totalLinks={links.length}
             onNewSnip={() => setIsModalOpen(true)}

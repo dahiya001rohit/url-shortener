@@ -10,7 +10,7 @@ export default function ProfileCard({ user }) {
 
   return (
     <div
-      className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6 flex items-center gap-5"
+      className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5"
       style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
     >
       {/* Avatar */}

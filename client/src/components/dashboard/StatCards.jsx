@@ -7,7 +7,7 @@ export default function StatCards({ stats = {} }) {
   const expiredPercent = Math.round((stats.expiredLinks / total) * 100);
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <StatCard icon={Link2} label="Total Links" value={stats.totalLinks} trend="+3 this week" trendType="up" delay={0} />
       <StatCard icon={MousePointerClick} label="Total Clicks" value={stats.totalClicks} trend="+2,847 this week" trendType="up" delay={50} />
       <StatCard icon={CheckCircle2} label="Active Links" value={stats.activeLinks} trend={`${activePercent}% of total`} trendType="neutral" delay={100} />

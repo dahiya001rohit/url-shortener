@@ -333,7 +333,7 @@ export default function DemoPage() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 lg:ml-56 pt-20 pb-16 px-6 lg:px-10">
+        <main className="flex-1 lg:ml-56 pt-20 pb-16 px-6 lg:px-10 xl:px-16 min-w-0">
           {/* Demo notice */}
           <div className="mb-6 bg-accent/10 border border-accent/30 rounded-2xl px-5 py-3 flex items-center justify-between">
             <span className="text-xs font-mono text-accent">
@@ -347,7 +347,7 @@ export default function DemoPage() {
             </button>
           </div>
 
-          <div className="max-w-5xl mx-auto">
+          <div className="w-full max-w-[1400px] mx-auto">
             <PageHeader totalLinks={links.length} onNewSnip={() => setIsModalOpen(true)} />
             <StatCards stats={stats} />
             <SearchFilters

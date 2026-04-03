@@ -37,15 +37,15 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <section className="py-32 px-6 bg-surface overflow-hidden">
+    <section className="py-32 bg-surface overflow-hidden">
       <motion.div
         ref={ref}
         initial={{ opacity: 0, y: 30 }}
         animate={visible ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="max-w-7xl mx-auto"
+        className="max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16"
       >
-        <div className="flex flex-col md:flex-row items-center justify-between gap-16 relative">
+        <div className="grid grid-cols-1 md:grid-cols-3 items-start gap-12 md:gap-8 relative">
           {/* Dashed connector line */}
           <div className="hidden md:block absolute top-1/2 left-[10%] right-[10%] h-[1px] border-t border-dashed border-outline-variant/40 -z-10" />
 

@@ -87,3 +87,12 @@
 }
 .btn-interact:hover { transform: scale(1.05); }
 .btn-interact:active { transform: scale(0.95); }
+
+/* Hide scrollbar but keep scrollable */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

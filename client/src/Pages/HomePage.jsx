@@ -53,14 +53,14 @@ export default function HomePage() {
 
   return (
     <div className="bg-background min-h-screen">
-      <div className="max-w-6xl mx-auto px-8 pt-28 pb-24">
+      <div className="w-full max-w-[1400px] mx-auto px-6 lg:px-10 xl:px-16 pt-28 pb-24">
         <GreetingHeader name={user?.name || "there"} />
 
         <QuickSnipCard onSnip={handleQuickSnip} />
 
         <HomeStatCards stats={stats} />
 
-        <div className="grid grid-cols-12 gap-6 mt-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8">
           <div className="col-span-12 lg:col-span-8">
             <RecentActivity activity={activity} />
           </div>

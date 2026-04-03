@@ -28,7 +28,7 @@ export default function TopLinks({ links = [] }) {
       {top3.length === 0 ? (
         <p className="text-xs text-secondary font-mono">No links yet. Create your first snip!</p>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {top3.map((link) => (
             <div
               key={link._id}

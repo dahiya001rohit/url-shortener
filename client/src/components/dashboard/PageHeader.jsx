@@ -3,7 +3,7 @@ import Button from "../shared/ui/Button";
 
 export default function PageHeader({ totalLinks, onNewSnip }) {
   return (
-    <div className="flex items-start justify-between mb-8">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
       <div>
         <h1 className="text-3xl font-headline italic text-foreground leading-tight">
           My Snips.
