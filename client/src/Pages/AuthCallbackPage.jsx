@@ -1,14 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { loginWithToken, isLoggedIn } = useAuth();
-  const [ready, setReady] = useState(false);
 
-  // Step 1: process the token once on mount
   useEffect(() => {
     const token = searchParams.get("token");
     const error = searchParams.get("error");
@@ -18,18 +14,11 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    loginWithToken(token)
-      .then(() => setReady(true))
-      .catch(() => {
-        localStorage.removeItem("accessToken");
-        navigate("/login");
-      });
+    // Store token then hard-redirect so AuthProvider re-initializes
+    // from localStorage on the fresh page load — avoids state sync races
+    localStorage.setItem("accessToken", token);
+    window.location.href = "/home";
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Step 2: navigate only once React has committed the auth state
-  useEffect(() => {
-    if (ready && isLoggedIn) navigate("/home");
-  }, [ready, isLoggedIn, navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
