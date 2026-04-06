@@ -34,7 +34,8 @@ export function AuthProvider({ children }) {
           setUser(data);
           applyPreferences(data.preferences);
         })
-        .catch(() => {
+        .catch((err) => {
+          console.error("[AuthContext] profile fetch failed:", err?.response?.status, err?.message);
           localStorage.removeItem("accessToken");
           setAccessToken(null);
         })

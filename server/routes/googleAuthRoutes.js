@@ -2,6 +2,8 @@ import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 
+const CLIENT = (process.env.CLIENT_URL || "").replace(/\/$/, "");
+
 const router = express.Router();
 
 // Start Google OAuth flow
@@ -15,7 +17,7 @@ router.get(
   "/google/callback",
   passport.authenticate("google", {
     session: false,
-    failureRedirect: `${process.env.CLIENT_URL}/login?error=google_failed`,
+    failureRedirect: `${CLIENT}/login?error=google_failed`,
   }),
   async (req, res) => {
     try {
@@ -40,9 +42,9 @@ router.get(
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
 
-      res.redirect(`${process.env.CLIENT_URL}/auth/callback?token=${accessToken}`);
+      res.redirect(`${CLIENT}/auth/callback?token=${accessToken}`);
     } catch (err) {
-      res.redirect(`${process.env.CLIENT_URL}/login?error=server_error`);
+      res.redirect(`${CLIENT}/login?error=server_error`);
     }
   }
 );

@@ -27,8 +27,20 @@ const PORT = process.env.PORT || 5000;
 
 app.use(compression());
 app.use(globalLimiter);
+const ALLOWED_ORIGINS = [
+  /^http:\/\/localhost(:\d+)?$/,
+  "http://url-shortener-1-elnl.onrender.com",
+  "https://url-shortener-1-elnl.onrender.com",
+];
+
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const allowed = ALLOWED_ORIGINS.some((o) =>
+      o instanceof RegExp ? o.test(origin) : o === origin
+    );
+    allowed ? callback(null, true) : callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
 }));
 app.use(express.json());
