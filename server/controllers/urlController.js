@@ -1,16 +1,19 @@
 import { nanoid } from "nanoid";
 import Url from "../models/Url.js";
 import Click from "../models/Click.js";
+import User from "../models/User.js";
 import redisClient from "../services/redis.js";
 import { analyticsQueue } from "../services/queue.js";
 
 export async function shortenUrl(req, res, next) {
   try {
-    const { originalUrl, expiresAt, customAlias } = req.body;
+    const userDoc = await User.findById(req.user.id).select("preferences");
+    const prefs = userDoc?.preferences;
 
+    // Determine short code
     let shortCode;
-    if (customAlias) {
-      const trimmed = customAlias.trim();
+    if (req.body.customAlias) {
+      const trimmed = req.body.customAlias.trim();
       if (!/^[a-zA-Z0-9-]+$/.test(trimmed)) {
         return res.status(400).json({ message: "Alias must be alphanumeric and hyphens only" });
       }
@@ -18,7 +21,33 @@ export async function shortenUrl(req, res, next) {
       if (existing) return res.status(409).json({ message: "Alias already taken" });
       shortCode = trimmed;
     } else {
-      shortCode = nanoid(6);
+      const style = prefs?.links?.aliasStyle || "Word-Scale";
+      if (style === "Short-Hash") shortCode = nanoid(4);
+      else if (style === "Alpha-Numeric") shortCode = nanoid(8);
+      else shortCode = nanoid(6);
+    }
+
+    // Determine expiry
+    let expiresAt = req.body.expiresAt;
+    if (!expiresAt && prefs?.links?.defaultExpiry && prefs.links.defaultExpiry !== "never") {
+      const daysMap = { "24h": 1, "7d": 7, "30d": 30, "90d": 90 };
+      const days = daysMap[prefs.links.defaultExpiry];
+      if (days) {
+        expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      }
+    }
+
+    // Apply UTM params
+    let originalUrl = req.body.originalUrl;
+    if (prefs?.links?.utmEnabled) {
+      const params = new URLSearchParams();
+      if (prefs.links.utmSource)   params.set("utm_source",   prefs.links.utmSource);
+      if (prefs.links.utmMedium)   params.set("utm_medium",   prefs.links.utmMedium);
+      if (prefs.links.utmCampaign) params.set("utm_campaign", prefs.links.utmCampaign);
+      if ([...params].length > 0) {
+        const sep = originalUrl.includes("?") ? "&" : "?";
+        originalUrl = `${originalUrl}${sep}${params.toString()}`;
+      }
     }
 
     const url = await Url.create({
@@ -49,47 +78,62 @@ export async function redirectUrl(req, res, next) {
     const cached = await redisClient.get(`url:${shortCode}`);
 
     if (cached) {
-      const { urlId, originalUrl, expiresAt } = JSON.parse(cached);
+      const { urlId, originalUrl, expiresAt, userId } = JSON.parse(cached);
       if (expiresAt && new Date(expiresAt) < new Date())
         return res.status(410).json({ message: "This link has expired" });
 
       res.redirect(originalUrl);
 
-      analyticsQueue.add("click", {
-        urlId,
-        shortCode,
-        ip: req.ip,
-        userAgent: req.headers["user-agent"],
-        referrer: req.headers["referer"] || "Direct",
-      }).catch((err) => console.error("Queue error:", err));
+      // Check owner's privacy preference
+      User.findById(userId).select("preferences").then((owner) => {
+        const allowTracking = owner?.preferences?.privacy?.allowAnonymousTracking !== false;
+        if (allowTracking) {
+          analyticsQueue.add("click", {
+            urlId,
+            shortCode,
+            ip: req.ip,
+            userAgent: req.headers["user-agent"],
+            referrer: req.headers["referer"] || "Direct",
+          }).catch((err) => console.error("Queue error:", err));
+        }
+      }).catch(() => {});
 
       return;
     }
 
     const url = await Url.findOne({ shortCode });
-
     if (!url) return res.status(404).json({ message: "Short URL not found" });
-
     if (url.expiresAt && url.expiresAt < new Date())
       return res.status(410).json({ message: "This link has expired" });
 
     res.redirect(url.originalUrl);
 
-    // Fire-and-forget: cache + analytics
+    // Fire-and-forget: cache
     redisClient.set(
       `url:${shortCode}`,
-      JSON.stringify({ urlId: url._id.toString(), originalUrl: url.originalUrl, expiresAt: url.expiresAt }),
+      JSON.stringify({
+        urlId: url._id.toString(),
+        originalUrl: url.originalUrl,
+        expiresAt: url.expiresAt,
+        userId: url.userId?.toString(),
+      }),
       "EX",
       3600
     ).catch((err) => console.error("Cache set error:", err));
 
-    analyticsQueue.add("click", {
-      urlId: url._id.toString(),
-      shortCode,
-      ip: req.ip,
-      userAgent: req.headers["user-agent"],
-      referrer: req.headers["referer"] || "Direct",
-    }).catch((err) => console.error("Queue error:", err));
+    // Check owner's privacy preference then queue
+    User.findById(url.userId).select("preferences").then((owner) => {
+      const allowTracking = owner?.preferences?.privacy?.allowAnonymousTracking !== false;
+      if (allowTracking) {
+        analyticsQueue.add("click", {
+          urlId: url._id.toString(),
+          shortCode,
+          ip: req.ip,
+          userAgent: req.headers["user-agent"],
+          referrer: req.headers["referer"] || "Direct",
+        }).catch((err) => console.error("Queue error:", err));
+      }
+    }).catch(() => {});
 
   } catch (err) {
     next(err);
@@ -241,11 +285,7 @@ export async function getRecentActivity(req, res, next) {
     }
 
     for (const url of urls) {
-      if (
-        url.expiresAt &&
-        url.expiresAt > now &&
-        url.expiresAt <= threeDaysFromNow
-      ) {
+      if (url.expiresAt && url.expiresAt > now && url.expiresAt <= threeDaysFromNow) {
         events.push({
           type: "expiry_warning",
           message: `snip.ly/${url.shortCode} expires soon`,
@@ -256,7 +296,6 @@ export async function getRecentActivity(req, res, next) {
     }
 
     events.sort((a, b) => new Date(b.time) - new Date(a.time));
-
     res.json(events.slice(0, 8));
   } catch (err) {
     next(err);

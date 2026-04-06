@@ -41,25 +41,25 @@ export default function TableRow({ link, onDelete }) {
 
   return (
     <tr className="border-b border-outline-variant/20 hover:bg-surface-container-low/50 transition-colors group">
-      <td className="py-3.5 pl-4 pr-3">
+      <td className="pl-4 pr-3" style={{ padding: "var(--density-row) 1rem" }}>
         <span className="font-mono text-sm text-primary font-bold">
           {BASE_URL}/{link.shortCode}
         </span>
       </td>
-      <td className="py-3.5 px-3 max-w-xs">
+      <td className="px-3 max-w-xs" style={{ padding: "var(--density-row) 0.75rem" }}>
         <span className="text-sm text-secondary truncate block" title={link.originalUrl}>
           {link.originalUrl}
         </span>
       </td>
-      <td className="py-3.5 px-3">
+      <td className="px-3" style={{ padding: "var(--density-row) 0.75rem" }}>
         <span className="text-sm font-mono text-foreground">
           {link.clicks.toLocaleString()}
         </span>
       </td>
-      <td className="py-3.5 px-3">
+      <td className="px-3" style={{ padding: "var(--density-row) 0.75rem" }}>
         <Badge variant={statusVariant}>{STATUS_LABELS[statusVariant]}</Badge>
       </td>
-      <td className="py-3.5 pl-3 pr-4">
+      <td className="pl-3 pr-4" style={{ padding: "var(--density-row) 1rem" }}>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           <button onClick={handleCopy} title="Copy short link" className="p-1.5 rounded-lg hover:bg-surface-container text-secondary hover:text-primary transition-all">
             {copied ? <Check className="w-4 h-4 text-primary" /> : <Copy className="w-4 h-4" />}

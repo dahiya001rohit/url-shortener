@@ -4,7 +4,6 @@ import ProfileCard from "../components/profile/ProfileCard";
 import ProfileSidebar from "../components/profile/ProfileSidebar";
 import PersonalInfoForm from "../components/profile/PersonalInfoForm";
 import SecurityForm from "../components/profile/SecurityForm";
-import PreferencesSection from "../components/profile/PreferencesSection";
 import AccountOverview from "../components/profile/AccountOverview";
 import DangerZone from "../components/profile/DangerZone";
 import PageHeader from "../components/shared/layout/PageHeader";
@@ -66,7 +65,6 @@ export default function ProfilePage() {
             {activeTab === "security" && (
               <SecurityForm onChangePassword={handleChangePassword} />
             )}
-            {activeTab === "preferences" && <PreferencesSection />}
           </div>
 
           <div className="col-span-full lg:col-span-3 space-y-4">

@@ -46,8 +46,8 @@ export default function StatCard({ label, value, trend, trendType = "neutral", i
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay / 1000, duration: 0.4, ease: "easeOut" }}
-      className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl p-6 flex flex-col gap-3"
-      style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
+      className="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl flex flex-col gap-3"
+      style={{ padding: "var(--density-card)", boxShadow: "0 2px 8px rgba(0,47,45,0.05)" }}
     >
       <div className="flex items-center justify-between">
         <span className="text-xs font-mono uppercase tracking-widest text-secondary">

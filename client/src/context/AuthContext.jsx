@@ -3,6 +3,23 @@ import api from "services/api";
 
 const AuthContext = createContext(null);
 
+function applyPreferences(preferences) {
+  if (!preferences) return;
+  if (preferences.accentColor) {
+    document.documentElement.style.setProperty("--primary", preferences.accentColor);
+    document.documentElement.style.setProperty("--ring", preferences.accentColor);
+    localStorage.setItem("snip-accent", preferences.accentColor);
+  }
+  if (preferences.density) {
+    document.documentElement.setAttribute("data-density", preferences.density);
+    localStorage.setItem("snip-density", preferences.density);
+  }
+  if (preferences.fontSize) {
+    document.documentElement.style.fontSize = `${preferences.fontSize}px`;
+    localStorage.setItem("snip_fontSize", String(preferences.fontSize));
+  }
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [accessToken, setAccessToken] = useState(
@@ -10,11 +27,13 @@ export function AuthProvider({ children }) {
   );
   const [loading, setLoading] = useState(true);
 
-  // On mount: if token exists try to restore profile
   useEffect(() => {
     if (accessToken) {
       api.get("/user/profile")
-        .then(({ data }) => setUser(data))
+        .then(({ data }) => {
+          setUser(data);
+          applyPreferences(data.preferences);
+        })
         .catch(() => {
           localStorage.removeItem("accessToken");
           setAccessToken(null);
@@ -56,6 +75,7 @@ export function AuthProvider({ children }) {
       register,
       logout,
       updateUser,
+      applyPreferences,
       isLoggedIn: !!user,
     }}>
       {children}

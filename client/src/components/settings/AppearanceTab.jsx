@@ -1,130 +1,109 @@
 import { useState, useEffect } from "react";
-import { Sun, Moon, Monitor } from "lucide-react";
 import Card from "../shared/ui/Card";
+import { useAuth } from "../../context/AuthContext";
+import api from "../../services/api";
 
 const ACCENT_COLORS = [
-  { value: "#002f2d", label: "Forest" },
-  { value: "#1d4ed8", label: "Cobalt" },
-  { value: "#7c3aed", label: "Violet" },
-  { value: "#be123c", label: "Rose" },
-  { value: "#b45309", label: "Amber" },
-  { value: "#0f766e", label: "Teal" },
+  { name: "Teal",   value: "#002F2D" },
+  { name: "Amber",  value: "#FFB95F" },
+  { name: "Blue",   value: "#3B82F6" },
+  { name: "Purple", value: "#8B5CF6" },
+  { name: "Red",    value: "#EF4444" },
+  { name: "Green",  value: "#10B981" },
 ];
 
-const THEME_ICONS = { light: Sun, dark: Moon, system: Monitor };
-
-function ThemeCard({ theme, isActive, onClick }) {
-  const Icon = THEME_ICONS[theme];
-  const isDark = theme === "dark";
-  return (
-    <button
-      onClick={onClick}
-      className={`flex flex-col items-center gap-3 p-4 rounded-2xl border transition-all ${
-        isActive
-          ? "border-primary bg-primary/5 ring-1 ring-primary"
-          : "border-outline-variant/40 hover:border-outline-variant bg-surface-container-low"
-      }`}
-    >
-      <div
-        className={`w-full h-16 rounded-xl overflow-hidden flex flex-col border border-outline-variant/20 ${
-          isDark ? "bg-gray-900" : "bg-white"
-        }`}
-      >
-        <div className={`h-3 flex items-center px-2 gap-1 ${isDark ? "bg-gray-800" : "bg-gray-100"}`}>
-          <span className="w-1 h-1 rounded-full bg-red-400" />
-          <span className="w-1 h-1 rounded-full bg-yellow-400" />
-          <span className="w-1 h-1 rounded-full bg-green-400" />
-        </div>
-        <div className="flex flex-1 gap-1 p-1">
-          <div className={`w-6 rounded-md ${isDark ? "bg-gray-700" : "bg-gray-200"}`} />
-          <div className="flex-1 space-y-1 pt-0.5">
-            <div className={`h-1.5 rounded w-3/4 ${isDark ? "bg-gray-600" : "bg-gray-300"}`} />
-            <div className={`h-1 rounded w-1/2 ${isDark ? "bg-gray-700" : "bg-gray-200"}`} />
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center gap-1.5">
-        <Icon className="w-3 h-3 text-secondary" />
-        <span className="text-xs font-mono uppercase tracking-wide text-secondary">{theme}</span>
-      </div>
-    </button>
-  );
-}
-
-function applyTheme(theme) {
-  const root = document.documentElement;
-  if (theme === "dark") {
-    root.classList.add("dark");
-  } else if (theme === "light") {
-    root.classList.remove("dark");
-  } else {
-    // system
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    root.classList.toggle("dark", prefersDark);
-  }
-}
+const DENSITY_OPTIONS = [
+  { id: "comfortable", label: "Comfortable" },
+  { id: "compact",     label: "Compact" },
+  { id: "cozy",        label: "Cozy" },
+];
 
 export default function AppearanceTab() {
-  const [theme, setTheme] = useState(() => localStorage.getItem("snip_theme") || "light");
-  const [accentColor, setAccentColor] = useState(() => localStorage.getItem("snip_accent") || "#002f2d");
-  const [density, setDensity] = useState(() => localStorage.getItem("snip_density") || "comfortable");
-  const [fontSize, setFontSize] = useState(() => Number(localStorage.getItem("snip_fontSize")) || 14);
+  const { user, applyPreferences } = useAuth();
 
-  useEffect(() => { applyTheme(theme); }, [theme]);
+  const [accentColor, setAccentColor] = useState(
+    () => localStorage.getItem("snip-accent") || "#002F2D"
+  );
+  const [density, setDensity] = useState(
+    () => localStorage.getItem("snip-density") || "comfortable"
+  );
+  const [fontSize, setFontSize] = useState(
+    () => Number(localStorage.getItem("snip_fontSize")) || 14
+  );
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    document.documentElement.style.fontSize = `${fontSize}px`;
-  }, [fontSize]);
+    const savedAccent = localStorage.getItem("snip-accent");
+    if (savedAccent) {
+      document.documentElement.style.setProperty("--primary", savedAccent);
+      document.documentElement.style.setProperty("--ring", savedAccent);
+    }
+    const savedDensity = localStorage.getItem("snip-density") || "comfortable";
+    document.documentElement.setAttribute("data-density", savedDensity);
+    const savedSize = Number(localStorage.getItem("snip_fontSize")) || 14;
+    document.documentElement.style.fontSize = `${savedSize}px`;
+  }, []);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-density", density);
-  }, [density]);
-
-  function handleTheme(t) {
-    setTheme(t);
-    localStorage.setItem("snip_theme", t);
+  function handleAccentChange(color) {
+    setAccentColor(color);
+    localStorage.setItem("snip-accent", color);
+    document.documentElement.style.setProperty("--primary", color);
+    document.documentElement.style.setProperty("--ring", color);
   }
 
-  function handleAccent(value) {
-    setAccentColor(value);
-    localStorage.setItem("snip_accent", value);
-    document.documentElement.style.setProperty("--color-primary-raw", value);
-  }
-
-  function handleDensity(d) {
-    setDensity(d);
-    localStorage.setItem("snip_density", d);
+  function handleDensityChange(val) {
+    setDensity(val);
+    localStorage.setItem("snip-density", val);
+    document.documentElement.setAttribute("data-density", val);
   }
 
   function handleFontSize(val) {
     const n = Number(val);
     setFontSize(n);
     localStorage.setItem("snip_fontSize", String(n));
+    document.documentElement.style.fontSize = `${n}px`;
+  }
+
+  async function handleSave() {
+    try {
+      setSaving(true);
+      const updatedPrefs = {
+        ...(user?.preferences || {}),
+        accentColor,
+        density,
+        fontSize,
+      };
+      await api.patch("/user/preferences", { preferences: updatedPrefs });
+      applyPreferences(updatedPrefs);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err) {
+      console.error("Save failed:", err);
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
     <div className="space-y-4">
       <Card>
-        <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">Appearance</p>
-        <h3 className="text-xl font-headline italic text-foreground mb-5">Theme Preference</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {["light", "dark", "system"].map((t) => (
-            <ThemeCard key={t} theme={t} isActive={theme === t} onClick={() => handleTheme(t)} />
-          ))}
-        </div>
-      </Card>
-
-      <Card>
         <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">Color</p>
         <h3 className="text-xl font-headline italic text-foreground mb-5">Accent Color</h3>
-        <div className="flex gap-3 flex-wrap">
-          {ACCENT_COLORS.map(({ value, label }) => (
+        <div className="flex items-center gap-3 flex-wrap">
+          {ACCENT_COLORS.map((color) => (
             <button
-              key={value}
-              onClick={() => handleAccent(value)}
-              className={`w-8 h-8 rounded-full transition-all ${accentColor === value ? "ring-2 ring-offset-2 ring-primary scale-110" : "hover:scale-105"}`}
-              style={{ backgroundColor: value }}
-              title={label}
+              key={color.value}
+              onClick={() => handleAccentChange(color.value)}
+              title={color.name}
+              className="w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 focus:outline-none"
+              style={{
+                background: color.value,
+                boxShadow: accentColor === color.value
+                  ? `0 0 0 2px white, 0 0 0 4px ${color.value}`
+                  : "none",
+                transform: accentColor === color.value ? "scale(1.15)" : "scale(1)",
+              }}
             />
           ))}
         </div>
@@ -134,15 +113,17 @@ export default function AppearanceTab() {
         <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">Layout</p>
         <h3 className="text-xl font-headline italic text-foreground mb-5">Display Density</h3>
         <div className="flex gap-2">
-          {["comfortable", "compact", "cozy"].map((d) => (
+          {DENSITY_OPTIONS.map(({ id, label }) => (
             <button
-              key={d}
-              onClick={() => handleDensity(d)}
+              key={id}
+              onClick={() => handleDensityChange(id)}
               className={`flex-1 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wide transition-colors ${
-                density === d ? "bg-primary text-on-primary" : "bg-surface-container text-secondary hover:bg-surface-container-high"
+                density === id
+                  ? "bg-primary text-on-primary"
+                  : "bg-surface-container text-secondary hover:bg-surface-container-high"
               }`}
             >
-              {d}
+              {label}
             </button>
           ))}
         </div>
@@ -167,6 +148,14 @@ export default function AppearanceTab() {
           <span className="text-xs font-mono text-outline">20px</span>
         </div>
       </Card>
+
+      <button
+        onClick={handleSave}
+        disabled={saving}
+        className="bg-primary text-on-primary rounded-full px-6 py-2.5 font-bold text-sm hover:opacity-90 transition-all duration-200 disabled:opacity-50 flex items-center gap-2"
+      >
+        {saving ? "Saving..." : saved ? "✓ Saved!" : "Save Preferences"}
+      </button>
     </div>
   );
 }

@@ -7,20 +7,12 @@ import PrivacyTab from "../components/settings/PrivacyTab";
 import IntegrationsTab from "../components/settings/IntegrationsTab";
 import PageHeader from "../components/shared/layout/PageHeader";
 import SidebarNav from "../components/shared/layout/SidebarNav";
-import Card from "../components/shared/ui/Card";
-
 const SETTINGS_TABS = [
   { id: "appearance", label: "Appearance", icon: Palette },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "links", label: "Links", icon: Link2 },
   { id: "privacy", label: "Privacy", icon: Shield },
   { id: "integrations", label: "Integrations", icon: Puzzle },
-];
-
-const CONFIG_ROWS = [
-  { label: "Theme", value: "Light" },
-  { label: "Region", value: "US/Pacific" },
-  { label: "API Access", value: "Enabled" },
 ];
 
 export default function SettingsPage() {
@@ -53,30 +45,6 @@ export default function SettingsPage() {
           </div>
 
           <div className="col-span-full lg:col-span-3 space-y-4">
-            <Card>
-              <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">
-                Summary
-              </p>
-              <h3 className="text-xl font-headline italic text-foreground mb-5">
-                Current Config
-              </h3>
-              <div>
-                {CONFIG_ROWS.map(({ label, value }, i) => (
-                  <div
-                    key={label}
-                    className={`flex items-center justify-between py-3 ${
-                      i < CONFIG_ROWS.length - 1
-                        ? "border-b border-outline-variant/20"
-                        : ""
-                    }`}
-                  >
-                    <span className="text-xs font-body text-secondary">{label}</span>
-                    <span className="text-xs font-mono font-medium text-foreground">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
             <div
               className="bg-primary rounded-2xl p-6 relative overflow-hidden"
               style={{ boxShadow: "0 2px 8px rgba(0,47,45,0.1)" }}

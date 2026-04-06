@@ -20,6 +20,7 @@ export async function getProfile(req, res, next) {
       name: user.name,
       email: user.email,
       bio: user.bio || "",
+      preferences: user.preferences,
       memberSince: user.createdAt,
       totalLinks,
       totalClicks,
@@ -86,7 +87,7 @@ export async function deleteAccount(req, res, next) {
       bio: "",
     });
     res.clearCookie("refreshToken");
-    res.json({ message: "Account deleted" });
+    res.json({ message: "Account deleted successfully" });
   } catch (err) {
     next(err);
   }
@@ -95,30 +96,49 @@ export async function deleteAccount(req, res, next) {
 export async function exportData(req, res, next) {
   try {
     const urls = await Url.find({ userId: req.user.id });
-    const clicks = await Click.find({
-      urlId: { $in: urls.map((u) => u._id) },
-    });
 
-    const headers = "Short Code,Original URL,Clicks,Created At,Expires At\n";
-    const rows = urls.map((u) => {
-      const clickCount = clicks.filter(
-        (c) => c.urlId.toString() === u._id.toString()
-      ).length;
-      return [
-        `snip.ly/${u.shortCode}`,
-        u.originalUrl,
-        clickCount,
-        new Date(u.createdAt).toLocaleDateString(),
-        u.expiresAt ? new Date(u.expiresAt).toLocaleDateString() : "Never",
-      ].join(",");
-    }).join("\n");
+    const headers = ["Short Code", "Original URL", "Clicks", "Created At", "Expires At"].join(",");
+
+    const rows = urls.map((u) => [
+      `snip.ly/${u.shortCode}`,
+      `"${u.originalUrl}"`,
+      u.clicks || 0,
+      new Date(u.createdAt).toLocaleDateString(),
+      u.expiresAt ? new Date(u.expiresAt).toLocaleDateString() : "Never",
+    ].join(","));
+
+    const csv = [headers, ...rows].join("\n");
 
     res.setHeader("Content-Type", "text/csv");
     res.setHeader(
       "Content-Disposition",
       `attachment; filename="snip-export-${Date.now()}.csv"`
     );
-    res.send(headers + rows);
+    res.send(csv);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getPreferences(req, res, next) {
+  try {
+    const user = await User.findById(req.user.id).select("preferences");
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user.preferences);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updatePreferences(req, res, next) {
+  try {
+    const { preferences } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { preferences } },
+      { new: true }
+    ).select("preferences");
+    res.json(user.preferences);
   } catch (err) {
     next(err);
   }

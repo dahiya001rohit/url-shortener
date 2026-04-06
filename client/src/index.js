@@ -13,6 +13,21 @@ if (_savedTheme === "dark") {
   document.documentElement.classList.add("dark");
 }
 
+// Apply saved accent color
+const _savedAccent = localStorage.getItem("snip-accent");
+if (_savedAccent) {
+  document.documentElement.style.setProperty("--primary", _savedAccent);
+  document.documentElement.style.setProperty("--ring", _savedAccent);
+}
+
+// Apply saved density
+const _savedDensity = localStorage.getItem("snip-density") || "comfortable";
+document.documentElement.setAttribute("data-density", _savedDensity);
+
+// Apply saved font size
+const _savedFontSize = Number(localStorage.getItem("snip_fontSize")) || 14;
+document.documentElement.style.fontSize = `${_savedFontSize}px`;
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

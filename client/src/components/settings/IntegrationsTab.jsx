@@ -1,95 +1,67 @@
-import { useState } from "react";
-import Card from "../shared/ui/Card";
-import Button from "../shared/ui/Button";
-import Badge from "../shared/ui/Badge";
+import { Plug, Bell } from "lucide-react";
 
 const INTEGRATIONS = [
-  { id: "zapier", name: "Zapier", description: "Automate workflows with 5,000+ apps", logo: "Z", logoColor: "#FF4A00", connectUrl: "https://zapier.com/apps/snip" },
-  { id: "slack", name: "Slack", description: "Get link performance alerts in Slack", logo: "#", logoColor: "#4A154B", connectUrl: "https://slack.com/oauth/v2/authorize" },
-  { id: "ga4", name: "Google Analytics 4", description: "Send click events to your GA4 property", logo: "GA", logoColor: "#E37400", connectUrl: "https://analytics.google.com" },
-  { id: "webhooks", name: "Webhooks", description: "1 active endpoint receiving click events", logo: "{}", logoColor: "#002f2d", connectUrl: null },
+  { name: "Zapier",           description: "Connect Snip to 5,000+ apps",       icon: "⚡", color: "#FF4A00" },
+  { name: "Slack",            description: "Get notifications in Slack",          icon: "#",  color: "#4A154B" },
+  { name: "Google Analytics", description: "Sync click data with GA4",            icon: "G",  color: "#4285F4" },
+  { name: "Webhooks",         description: "Send events to your endpoint",        icon: "⚙",  color: "#002F2D" },
 ];
 
-const DEFAULT_CONNECTED = { zapier: false, slack: false, ga4: true, webhooks: true };
-
-function loadConnected() {
-  try {
-    const saved = localStorage.getItem("snip_integrations");
-    return saved ? JSON.parse(saved) : DEFAULT_CONNECTED;
-  } catch {
-    return DEFAULT_CONNECTED;
-  }
-}
-
 export default function IntegrationsTab() {
-  const [connected, setConnected] = useState(loadConnected);
-
-  function handleAction(id, connectUrl) {
-    if (connected[id]) {
-      // Disconnect
-      setConnected((prev) => {
-        const next = { ...prev, [id]: false };
-        localStorage.setItem("snip_integrations", JSON.stringify(next));
-        return next;
-      });
-    } else {
-      // Connect — open OAuth/external page if available
-      if (connectUrl) {
-        window.open(connectUrl, "_blank", "noopener,noreferrer");
-      }
-      setConnected((prev) => {
-        const next = { ...prev, [id]: true };
-        localStorage.setItem("snip_integrations", JSON.stringify(next));
-        return next;
-      });
-    }
-  }
-
   return (
-    <Card>
-      <p className="text-xs font-mono uppercase tracking-widest text-secondary mb-1">Integrations</p>
-      <h3 className="text-xl font-headline italic text-foreground mb-5">Connected Apps</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {INTEGRATIONS.map(({ id, name, description, logo, logoColor, connectUrl }) => {
-          const isConnected = connected[id];
-          return (
-            <div
-              key={id}
-              className={`rounded-2xl p-5 flex flex-col gap-3 border ${
-                isConnected ? "bg-primary border-primary" : "bg-surface-container-low border-outline-variant/40"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-mono font-bold text-white shrink-0"
-                  style={{ backgroundColor: isConnected ? "rgba(255,255,255,0.15)" : logoColor }}
-                >
-                  {logo}
-                </div>
-                <div>
-                  <p className={`text-sm font-body font-medium ${isConnected ? "text-white" : "text-foreground"}`}>
-                    {name}
-                  </p>
-                  <Badge variant={isConnected ? "active" : "noExpiry"} className={isConnected ? "text-on-primary-container" : ""}>
-                    {isConnected ? "Connected" : "Not Connected"}
-                  </Badge>
-                </div>
-              </div>
-              <p className={`text-xs font-body leading-relaxed flex-1 ${isConnected ? "text-white/70" : "text-secondary"}`}>
-                {description}
-              </p>
-              <Button
-                variant="secondary"
-                size="sm"
-                className={`w-full ${isConnected ? "!bg-white/10 !text-white !border-white/20 hover:!bg-white/20" : ""}`}
-                onClick={() => handleAction(id, connectUrl)}
-              >
-                {isConnected ? "Disconnect" : "Connect"}
-              </Button>
-            </div>
-          );
-        })}
+    <div className="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-8">
+      {/* Coming Soon Banner */}
+      <div className="flex items-start gap-4 mb-8 p-5 bg-primary/5 border border-primary/20 rounded-2xl">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+          <Plug size={18} className="text-primary" />
+        </div>
+        <div className="flex-1">
+          <p className="font-bold text-sm text-primary mb-1">Integrations — Coming Soon</p>
+          <p className="text-xs text-secondary leading-relaxed">
+            We are building integrations with popular tools. These will be available in a future update.
+          </p>
+        </div>
+        <span className="bg-accent/20 text-accent border border-accent/30 rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-widest shrink-0">
+          In Development
+        </span>
       </div>
-    </Card>
+
+      {/* Disabled integration cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {INTEGRATIONS.map((item) => (
+          <div
+            key={item.name}
+            className="relative p-5 bg-surface-low border border-outline-variant/30 rounded-xl opacity-50 cursor-not-allowed select-none"
+          >
+            <span className="absolute top-3 right-3 bg-surface-container text-outline rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest">
+              Soon
+            </span>
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0"
+                style={{ background: item.color }}
+              >
+                {item.icon}
+              </div>
+              <div>
+                <p className="font-medium text-sm text-foreground">{item.name}</p>
+                <p className="text-xs text-secondary mt-0.5">{item.description}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Notify footer */}
+      <div className="mt-6 pt-5 border-t border-outline-variant/20 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bell size={13} className="text-outline" />
+          <p className="font-mono text-xs text-outline">Want to know when integrations launch?</p>
+        </div>
+        <button className="font-mono text-xs text-primary hover:underline transition">
+          Notify me →
+        </button>
+      </div>
+    </div>
   );
 }
