@@ -66,6 +66,15 @@ export function AuthProvider({ children }) {
 
   const updateUser = (data) => setUser((prev) => ({ ...prev, ...data }));
 
+  const loginWithToken = async (token) => {
+    localStorage.setItem("accessToken", token);
+    setAccessToken(token);
+    const { data } = await api.get("/user/profile");
+    setUser(data);
+    applyPreferences(data.preferences);
+    return data;
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -75,6 +84,7 @@ export function AuthProvider({ children }) {
       register,
       logout,
       updateUser,
+      loginWithToken,
       applyPreferences,
       isLoggedIn: !!user,
     }}>

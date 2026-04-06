@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import api from "../services/api";
 
 export default function AuthCallbackPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { updateUser } = useAuth();
+  const { loginWithToken } = useAuth();
 
   useEffect(() => {
     const token = searchParams.get("token");
@@ -22,13 +21,8 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    localStorage.setItem("accessToken", token);
-
-    api.get("/user/profile")
-      .then((res) => {
-        updateUser(res.data);
-        navigate("/home");
-      })
+    loginWithToken(token)
+      .then(() => navigate("/home"))
       .catch(() => {
         localStorage.removeItem("accessToken");
         navigate("/login");
