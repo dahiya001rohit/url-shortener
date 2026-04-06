@@ -43,46 +43,54 @@ export async function shortenUrl(req, res, next) {
 }
 
 export async function redirectUrl(req, res, next) {
-  try {
-    const { shortCode } = req.params;
+  const { shortCode } = req.params;
 
+  try {
     const cached = await redisClient.get(`url:${shortCode}`);
+
     if (cached) {
       const { urlId, originalUrl, expiresAt } = JSON.parse(cached);
       if (expiresAt && new Date(expiresAt) < new Date())
         return res.status(410).json({ message: "This link has expired" });
+
+      res.redirect(originalUrl);
+
       analyticsQueue.add("click", {
         urlId,
         shortCode,
         ip: req.ip,
         userAgent: req.headers["user-agent"],
-        referrer: req.headers["referer"],
-      });
-      return res.redirect(originalUrl);
+        referrer: req.headers["referer"] || "Direct",
+      }).catch((err) => console.error("Queue error:", err));
+
+      return;
     }
 
     const url = await Url.findOne({ shortCode });
+
     if (!url) return res.status(404).json({ message: "Short URL not found" });
 
     if (url.expiresAt && url.expiresAt < new Date())
       return res.status(410).json({ message: "This link has expired" });
 
-    await redisClient.set(
+    res.redirect(url.originalUrl);
+
+    // Fire-and-forget: cache + analytics
+    redisClient.set(
       `url:${shortCode}`,
-      JSON.stringify({ urlId: url._id, originalUrl: url.originalUrl, expiresAt: url.expiresAt }),
+      JSON.stringify({ urlId: url._id.toString(), originalUrl: url.originalUrl, expiresAt: url.expiresAt }),
       "EX",
       3600
-    );
+    ).catch((err) => console.error("Cache set error:", err));
 
     analyticsQueue.add("click", {
-      urlId: url._id,
+      urlId: url._id.toString(),
       shortCode,
       ip: req.ip,
       userAgent: req.headers["user-agent"],
-      referrer: req.headers["referer"],
-    });
+      referrer: req.headers["referer"] || "Direct",
+    }).catch((err) => console.error("Queue error:", err));
 
-    res.redirect(url.originalUrl);
   } catch (err) {
     next(err);
   }
@@ -130,30 +138,63 @@ export async function editUrl(req, res, next) {
 export async function getStats(req, res, next) {
   try {
     const urls = await Url.find({ userId: req.user.id });
+    const now = new Date();
+    const urlIds = urls.map((u) => u._id);
+
+    const thisWeekStart = new Date();
+    thisWeekStart.setDate(now.getDate() - 7);
+    thisWeekStart.setHours(0, 0, 0, 0);
+
+    const lastWeekStart = new Date();
+    lastWeekStart.setDate(now.getDate() - 14);
+    lastWeekStart.setHours(0, 0, 0, 0);
 
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
-    const todayClicks = await Click.countDocuments({
-      urlId: { $in: urls.map((u) => u._id) },
-      timestamp: { $gte: todayStart },
-    });
 
-    const activeLinks = urls.filter(
-      (u) => !u.expiresAt || u.expiresAt > new Date()
+    const linksThisWeek = urls.filter((u) => new Date(u.createdAt) >= thisWeekStart).length;
+    const linksLastWeek = urls.filter(
+      (u) => new Date(u.createdAt) >= lastWeekStart && new Date(u.createdAt) < thisWeekStart
     ).length;
 
-    const totalReach = urls.reduce((sum, u) => sum + (u.clicks || 0), 0);
+    const [clicksThisWeek, clicksLastWeek, todayClicks] = await Promise.all([
+      Click.countDocuments({ urlId: { $in: urlIds }, timestamp: { $gte: thisWeekStart } }),
+      Click.countDocuments({ urlId: { $in: urlIds }, timestamp: { $gte: lastWeekStart, $lt: thisWeekStart } }),
+      Click.countDocuments({ urlId: { $in: urlIds }, timestamp: { $gte: todayStart } }),
+    ]);
 
+    const activeLinks = urls.filter((u) => !u.expiresAt || u.expiresAt > now).length;
+    const expiredLinks = urls.length - activeLinks;
+    const totalReach = urls.reduce((sum, u) => sum + (u.clicks || 0), 0);
     const topLink = [...urls].sort((a, b) => (b.clicks || 0) - (a.clicks || 0))[0];
 
+    function trendPct(current, previous) {
+      if (previous === 0 && current === 0) return null;
+      if (previous === 0) return { value: 100, direction: "up" };
+      const pct = Math.round(((current - previous) / previous) * 100);
+      return { value: Math.min(Math.abs(pct), 999), direction: pct >= 0 ? "up" : "down" };
+    }
+
     res.json({
-      todayClicks,
-      activeLinks,
-      totalReach,
       totalLinks: urls.length,
-      topLink: topLink
-        ? { shortCode: topLink.shortCode, clicks: topLink.clicks }
-        : null,
+      totalClicks: totalReach,
+      activeLinks,
+      expiredLinks,
+      todayClicks,
+      totalReach,
+      topLink: topLink ? { shortCode: topLink.shortCode, clicks: topLink.clicks } : null,
+      trends: {
+        links: {
+          thisWeek: linksThisWeek,
+          lastWeek: linksLastWeek,
+          pct: trendPct(linksThisWeek, linksLastWeek),
+        },
+        clicks: {
+          thisWeek: clicksThisWeek,
+          lastWeek: clicksLastWeek,
+          pct: trendPct(clicksThisWeek, clicksLastWeek),
+        },
+      },
     });
   } catch (err) {
     next(err);

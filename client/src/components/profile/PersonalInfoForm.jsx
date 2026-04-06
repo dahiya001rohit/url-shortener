@@ -6,19 +6,23 @@ import Button from "../shared/ui/Button";
 export default function PersonalInfoForm({ user, onSave }) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user.name,
-    email: user.email,
-    bio: "Digital curator and minimalist designer. Organizing the web, one snip at a time.",
+    name: user?.name || "",
+    email: user?.email || "",
+    bio: user?.bio || "",
   });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!isEditing) {
-      setFormData((prev) => ({ ...prev, name: user.name, email: user.email }));
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        bio: user.bio || "",
+      });
     }
-  }, [user.name, user.email, isEditing]);
+  }, [user?.name, user?.email, user?.bio]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleChange(e) {
     setFormData((f) => ({ ...f, [e.target.name]: e.target.value }));
@@ -41,7 +45,11 @@ export default function PersonalInfoForm({ user, onSave }) {
   }
 
   function handleCancel() {
-    setFormData((prev) => ({ ...prev, name: user.name, email: user.email }));
+    setFormData({
+      name: user?.name || "",
+      email: user?.email || "",
+      bio: user?.bio || "",
+    });
     setError("");
     setIsEditing(false);
   }
@@ -81,14 +89,24 @@ export default function PersonalInfoForm({ user, onSave }) {
           onChange={handleChange}
           disabled={!isEditing}
         />
-        <Input
-          label="Bio"
-          name="bio"
-          value={formData.bio}
-          onChange={handleChange}
-          disabled={!isEditing}
-          rows={3}
-        />
+        <div>
+          <label className="font-mono text-xs uppercase tracking-widest text-outline mb-1.5 block">
+            Bio
+          </label>
+          <textarea
+            rows={3}
+            name="bio"
+            disabled={!isEditing}
+            value={formData.bio}
+            onChange={handleChange}
+            placeholder="Tell the world about yourself..."
+            className={`w-full rounded-xl px-4 py-3 font-body text-sm resize-none transition-all duration-200 ${
+              isEditing
+                ? "bg-white border border-outline-variant focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none"
+                : "bg-surface-container cursor-not-allowed text-secondary border border-transparent"
+            }`}
+          />
+        </div>
       </div>
 
       {error && (

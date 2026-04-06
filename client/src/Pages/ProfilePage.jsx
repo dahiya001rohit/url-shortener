@@ -20,6 +20,7 @@ export default function ProfilePage() {
   const profileUser = {
     name: user?.name || "",
     email: user?.email || "",
+    bio: user?.bio || "",
     totalLinks: user?.totalLinks ?? urlStats.totalLinks,
     totalClicks: user?.totalClicks ?? urlStats.totalClicks,
     memberSince: user?.memberSince
@@ -31,8 +32,9 @@ export default function ProfilePage() {
     const { data } = await api.patch("/user/profile", {
       name: formData.name,
       email: formData.email,
+      bio: formData.bio,
     });
-    updateUser({ name: data.name, email: data.email });
+    updateUser({ name: data.name, email: data.email, bio: data.bio });
   }
 
   async function handleChangePassword(currentPassword, newPassword) {

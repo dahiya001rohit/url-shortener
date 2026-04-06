@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "../shared/ui/Card";
 import Toggle from "../shared/ui/Toggle";
 
@@ -12,12 +12,46 @@ const NOTIFICATION_TOGGLES = [
   { id: "securityAlerts", label: "Security Alerts", description: "New logins and suspicious activity" },
 ];
 
+function getSystemTheme() {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(selected) {
+  const root = document.documentElement;
+  if (selected === "system") {
+    root.classList.toggle("dark", getSystemTheme() === "dark");
+  } else {
+    root.classList.toggle("dark", selected === "dark");
+  }
+}
+
 export default function PreferencesSection() {
-  const [theme, setTheme] = useState("Light");
+  const [theme, setTheme] = useState(
+    localStorage.getItem("snip-theme") || "system"
+  );
   const [emailFreq, setEmailFreq] = useState("Weekly");
   const [notifs, setNotifs] = useState(
     Object.fromEntries(NOTIFICATION_TOGGLES.map((t) => [t.id, t.id !== "newFeatures"]))
   );
+
+  // Apply on mount
+  useEffect(() => {
+    applyTheme(theme);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Listen for system theme changes when "system" is selected
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handle = () => { if (theme === "system") applyTheme("system"); };
+    mq.addEventListener("change", handle);
+    return () => mq.removeEventListener("change", handle);
+  }, [theme]);
+
+  function handleThemeChange(newTheme) {
+    setTheme(newTheme);
+    localStorage.setItem("snip-theme", newTheme);
+    applyTheme(newTheme);
+  }
 
   return (
     <div className="space-y-4">
@@ -32,9 +66,9 @@ export default function PreferencesSection() {
           {["Light", "Dark", "System"].map((t) => (
             <button
               key={t}
-              onClick={() => setTheme(t)}
+              onClick={() => handleThemeChange(t.toLowerCase())}
               className={`flex-1 py-2.5 rounded-xl text-xs font-mono uppercase tracking-wide transition-colors ${
-                theme === t
+                theme === t.toLowerCase()
                   ? "bg-primary text-on-primary"
                   : "bg-surface-container text-secondary hover:bg-surface-container-high"
               }`}

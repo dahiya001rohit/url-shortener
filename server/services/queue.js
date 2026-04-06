@@ -6,6 +6,9 @@ const connection = new Redis(process.env.REDIS_URL, {
   maxRetriesPerRequest: null,
 });
 
-export const analyticsQueue = new Queue("analytics", {connection});
+connection.on("error", (err) => console.error("BullMQ Redis error:", err.message));
 
-new Worker("analytics", processClick, {connection});
+export const analyticsQueue = new Queue("analytics", { connection });
+
+const worker = new Worker("analytics", processClick, { connection });
+worker.on("failed", (job, err) => console.error(`Job ${job?.id} failed:`, err.message));

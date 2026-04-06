@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5010/api",
   withCredentials: true,
 });
 
@@ -21,7 +21,7 @@ api.interceptors.response.use(
       original._retry = true;
       try {
         const { data } = await axios.post(
-          `${process.env.REACT_APP_API_URL || "http://localhost:5000/api"}/auth/refresh`,
+          `${process.env.REACT_APP_API_URL || "http://localhost:5010/api"}/auth/refresh`,
           {},
           { withCredentials: true }
         );

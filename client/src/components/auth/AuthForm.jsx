@@ -91,9 +91,9 @@ export default function AuthForm({ variant = "login", onSubmit, apiError, loadin
               Password
             </label>
             {isLogin && (
-              <a href="#" className="text-[10px] font-mono uppercase tracking-widest text-tertiary-container hover:text-primary transition-colors">
+              <button type="button" className="text-[10px] font-mono uppercase tracking-widest text-tertiary-container hover:text-primary transition-colors">
                 Forgot?
-              </a>
+              </button>
             )}
           </div>
           <div className="relative">
@@ -169,13 +169,13 @@ export default function AuthForm({ variant = "login", onSubmit, apiError, loadin
             />
             <label htmlFor="terms" className="text-sm text-on-surface-variant font-body leading-relaxed">
               I agree to the{" "}
-              <a href="#" className="text-primary underline underline-offset-4 hover:text-on-tertiary-container transition-colors">
+              <button type="button" className="text-primary underline underline-offset-4 hover:text-on-tertiary-container transition-colors">
                 Terms of Service
-              </a>{" "}
+              </button>{" "}
               and{" "}
-              <a href="#" className="text-primary underline underline-offset-4 hover:text-on-tertiary-container transition-colors">
+              <button type="button" className="text-primary underline underline-offset-4 hover:text-on-tertiary-container transition-colors">
                 Privacy Policy
-              </a>
+              </button>
               .
             </label>
           </div>

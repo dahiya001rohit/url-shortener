@@ -2,6 +2,8 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import compression from "compression";
+import geoip from "geoip-lite";
 import { connectDB } from "./services/db.js";
 import healthRouter from "./routes/health.js";
 import authRouter from "./routes/authRoutes.js";
@@ -13,12 +15,17 @@ import { authenticate } from "./middleware/auth.js";
 import { globalLimiter } from "./middleware/rateLimiter.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
+// Preload GeoIP database on startup
+geoip.startWatchingDataUpdate();
+console.log("✅ GeoIP database preloaded");
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.use(compression());
 app.use(globalLimiter);
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001"],
+  origin: ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
   credentials: true,
 }));
 app.use(express.json());

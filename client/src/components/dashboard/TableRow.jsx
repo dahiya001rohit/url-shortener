@@ -42,7 +42,7 @@ export default function TableRow({ link, onDelete }) {
   return (
     <tr className="border-b border-outline-variant/20 hover:bg-surface-container-low/50 transition-colors group">
       <td className="py-3.5 pl-4 pr-3">
-        <span className="font-mono text-sm text-primary">
+        <span className="font-mono text-sm text-primary font-bold">
           {BASE_URL}/{link.shortCode}
         </span>
       </td>

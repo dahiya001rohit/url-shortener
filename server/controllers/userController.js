@@ -19,6 +19,7 @@ export async function getProfile(req, res, next) {
       id: user._id,
       name: user.name,
       email: user.email,
+      bio: user.bio || "",
       memberSince: user.createdAt,
       totalLinks,
       totalClicks,
@@ -32,7 +33,7 @@ export async function getProfile(req, res, next) {
 
 export async function updateProfile(req, res, next) {
   try {
-    const { name, email } = req.body;
+    const { name, email, bio } = req.body;
     if (!name) return res.status(400).json({ message: "Name is required" });
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return res.status(400).json({ message: "Valid email is required" });
@@ -42,7 +43,7 @@ export async function updateProfile(req, res, next) {
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { name, email },
+      { name, email, bio: bio || "" },
       { new: true }
     ).select("-password");
     res.json(user);
@@ -75,12 +76,49 @@ export async function changePassword(req, res, next) {
 export async function deleteAccount(req, res, next) {
   try {
     const urls = await Url.find({ userId: req.user.id });
-    const urlIds = urls.map((u) => u._id);
-    await Click.deleteMany({ urlId: { $in: urlIds } });
+    await Click.deleteMany({ urlId: { $in: urls.map((u) => u._id) } });
     await Url.deleteMany({ userId: req.user.id });
-    await User.findByIdAndDelete(req.user.id);
+    await User.findByIdAndUpdate(req.user.id, {
+      isDeleted: true,
+      deletedAt: new Date(),
+      name: "Deleted User",
+      password: "DELETED",
+      bio: "",
+    });
     res.clearCookie("refreshToken");
     res.json({ message: "Account deleted" });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function exportData(req, res, next) {
+  try {
+    const urls = await Url.find({ userId: req.user.id });
+    const clicks = await Click.find({
+      urlId: { $in: urls.map((u) => u._id) },
+    });
+
+    const headers = "Short Code,Original URL,Clicks,Created At,Expires At\n";
+    const rows = urls.map((u) => {
+      const clickCount = clicks.filter(
+        (c) => c.urlId.toString() === u._id.toString()
+      ).length;
+      return [
+        `snip.ly/${u.shortCode}`,
+        u.originalUrl,
+        clickCount,
+        new Date(u.createdAt).toLocaleDateString(),
+        u.expiresAt ? new Date(u.expiresAt).toLocaleDateString() : "Never",
+      ].join(",");
+    }).join("\n");
+
+    res.setHeader("Content-Type", "text/csv");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="snip-export-${Date.now()}.csv"`
+    );
+    res.send(headers + rows);
   } catch (err) {
     next(err);
   }

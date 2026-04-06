@@ -11,4 +11,8 @@ const clickSchema = new mongoose.Schema({
   referrer: { type: String, default: "Direct" },
 });
 
+clickSchema.index({ urlId: 1 });
+clickSchema.index({ shortCode: 1 });
+clickSchema.index({ timestamp: -1 });
+
 export default mongoose.model("Click", clickSchema);

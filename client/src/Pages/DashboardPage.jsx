@@ -1,13 +1,4 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {
-  LayoutDashboard,
-  BarChart2,
-  FolderOpen,
-  Archive,
-  Settings,
-  User,
-} from "lucide-react";
 
 import PageHeader from "../components/dashboard/PageHeader";
 import StatCards from "../components/dashboard/StatCards";
@@ -15,14 +6,6 @@ import SearchFilters from "../components/dashboard/SearchFilters";
 import LinksTable from "../components/dashboard/LinksTable";
 import NewSnipModal from "../components/dashboard/NewSnipModal";
 import api from "../services/api";
-
-// ─── Sidebar nav items ─────────────────────────────────────────────────────────
-const NAV_ITEMS = [
-  { label: "Dashboard", icon: LayoutDashboard, href: "/dashboard" },
-  { label: "Analytics", icon: BarChart2, href: "/analytics/overview" },
-  { label: "Collections", icon: FolderOpen, href: "#" },
-  { label: "Archive", icon: Archive, href: "#" },
-];
 
 // ─── Status helper ─────────────────────────────────────────────────────────────
 function getLinkStatus(link) {
@@ -33,16 +16,20 @@ function getLinkStatus(link) {
 // ─── Component ─────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
   const [links, setLinks] = useState([]);
+  const [trends, setTrends] = useState(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loadingLinks, setLoadingLinks] = useState(true);
-  const navigate = useNavigate();
 
   const fetchLinks = useCallback(async () => {
     try {
-      const { data } = await api.get("/url/my-urls");
-      setLinks(data);
+      const [{ data: urlData }, { data: statsData }] = await Promise.all([
+        api.get("/url/my-urls"),
+        api.get("/url/stats"),
+      ]);
+      setLinks(urlData);
+      setTrends(statsData.trends || null);
     } catch (err) {
       console.error("Failed to fetch links", err);
     } finally {
@@ -115,55 +102,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* ── Sidebar ────────────────────────────────────────────────────────── */}
-      <aside className="hidden lg:flex flex-col w-56 shrink-0 border-r border-outline-variant/20 bg-surface-container-lowest pt-28 pb-6 px-3">
-        <nav className="flex-1 space-y-1">
-          {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
-            const isActive =
-              href !== "#" && window.location.pathname === href;
-            return (
-              <Link
-                key={label}
-                to={href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-body transition-colors ${
-                  isActive
-                    ? "bg-primary/10 text-primary font-medium"
-                    : "text-secondary hover:bg-surface-container hover:text-foreground"
-                }`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Bottom actions */}
-        <div className="border-t border-outline-variant/20 pt-4 space-y-1">
-          <button onClick={() => navigate("/settings")} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-body text-secondary hover:bg-surface-container hover:text-foreground transition-colors">
-            <Settings className="w-4 h-4 shrink-0" />
-            Settings
-          </button>
-          <button
-            onClick={() => navigate("/profile")}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-body text-secondary hover:bg-surface-container hover:text-foreground transition-colors"
-          >
-            <User className="w-4 h-4 shrink-0" />
-            Account
-          </button>
-        </div>
-      </aside>
-
+    <div className="min-h-screen bg-background">
       {/* ── Main content ───────────────────────────────────────────────────── */}
-      <main className="flex-1 pt-28 pb-16 px-6 lg:px-10 xl:px-16 min-w-0">
+      <main className="pt-28 pb-16 px-6 lg:px-10 xl:px-16">
         <div className="w-full max-w-[1400px] mx-auto">
           <PageHeader
             totalLinks={links.length}
             onNewSnip={() => setIsModalOpen(true)}
           />
 
-          <StatCards stats={stats} />
+          <StatCards stats={stats} trends={trends} />
 
           <SearchFilters
             search={search}

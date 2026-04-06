@@ -1,5 +1,3 @@
-import { Pencil } from "lucide-react";
-
 export default function ProfileCard({ user }) {
   const initials = user.name
     .split(" ")
@@ -41,11 +39,6 @@ export default function ProfileCard({ user }) {
         </div>
       </div>
 
-      {/* Edit button */}
-      <button className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-primary hover:text-primary-container transition-colors shrink-0">
-        <Pencil className="w-3 h-3" />
-        Edit Profile
-      </button>
     </div>
   );
 }

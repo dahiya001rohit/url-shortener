@@ -9,4 +9,6 @@ const urlSchema = new mongoose.Schema({
   expiresAt: { type: Date, default: null },
 });
 
+urlSchema.index({ userId: 1, createdAt: -1 });
+
 export default mongoose.model("Url", urlSchema);

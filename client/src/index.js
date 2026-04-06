@@ -5,6 +5,14 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from './context/AuthContext';
 
+// Apply saved theme before first render to avoid flash
+const _savedTheme = localStorage.getItem("snip-theme") || "system";
+if (_savedTheme === "dark") {
+  document.documentElement.classList.add("dark");
+} else if (_savedTheme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+  document.documentElement.classList.add("dark");
+}
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

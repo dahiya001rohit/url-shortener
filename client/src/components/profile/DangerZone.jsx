@@ -2,9 +2,32 @@ import { useState } from "react";
 import { Download, Trash2, AlertTriangle } from "lucide-react";
 import Card from "../shared/ui/Card";
 import Button from "../shared/ui/Button";
+import api from "../../services/api";
 
 export default function DangerZone({ onDelete }) {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState("");
+
+  async function handleExport() {
+    try {
+      setExporting(true);
+      setExportError("");
+      const response = await api.get("/user/export", { responseType: "blob" });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `snip-export-${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setExportError("Export failed. Try again.");
+    } finally {
+      setExporting(false);
+    }
+  }
 
   return (
     <Card className="border-error/20">
@@ -20,12 +43,16 @@ export default function DangerZone({ onDelete }) {
 
       <div className="space-y-3">
         <button
-          onClick={() => console.log("export data")}
-          className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl border border-outline-variant/50 text-sm font-body text-foreground hover:bg-surface-container transition-colors text-left"
+          onClick={handleExport}
+          disabled={exporting}
+          className="w-full flex items-center gap-2.5 px-4 py-3 rounded-xl border border-outline-variant/50 text-sm font-body text-foreground hover:bg-surface-container transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Download className="w-4 h-4 text-secondary shrink-0" />
-          Export Data (.CSV)
+          {exporting ? "Exporting…" : "Export Data (.CSV)"}
         </button>
+        {exportError && (
+          <p className="text-xs text-error font-mono">{exportError}</p>
+        )}
 
         {!deleteConfirm ? (
           <button
