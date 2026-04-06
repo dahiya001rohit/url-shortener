@@ -20,7 +20,7 @@ function getStrength(pw) {
 }
 
 /** variant = "login" | "register" */
-export default function AuthForm({ variant = "login", onSubmit, apiError, loading }) {
+export default function AuthForm({ variant = "login", onSubmit, apiError, loading, onGoogleLogin }) {
   const isLogin = variant === "login";
 
   const [form, setForm] = useState({
@@ -202,7 +202,7 @@ export default function AuthForm({ variant = "login", onSubmit, apiError, loadin
           </Button>
 
           <AuthDivider />
-          <GoogleButton />
+          <GoogleButton onClick={onGoogleLogin} />
         </div>
       </form>
 

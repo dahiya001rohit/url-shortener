@@ -6,11 +6,17 @@ import AuthLeftPanel from "../components/auth/AuthLeftPanel";
 import AuthForm from "../components/auth/AuthForm";
 import { useAuth } from "../context/AuthContext";
 
+const API_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+
 export default function RegisterPage() {
   const { register, login } = useAuth();
   const navigate = useNavigate();
   const [apiError, setApiError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_BASE}/api/auth/google`;
+  };
 
   const handleSubmit = async ({ name, email, password, confirmPassword, terms }) => {
     if (password !== confirmPassword) return;
@@ -48,7 +54,7 @@ export default function RegisterPage() {
         </nav>
 
         <div className="flex-1 flex items-center justify-center">
-          <AuthForm variant="register" onSubmit={handleSubmit} apiError={apiError} loading={loading} />
+          <AuthForm variant="register" onSubmit={handleSubmit} apiError={apiError} loading={loading} onGoogleLogin={handleGoogleLogin} />
         </div>
 
         <footer className="pt-8 text-[10px] font-mono uppercase tracking-widest text-outline/40 text-center">

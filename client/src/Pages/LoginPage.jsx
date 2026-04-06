@@ -1,16 +1,26 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import AuthShell from "../components/auth/AuthShell";
 import AuthLeftPanel from "../components/auth/AuthLeftPanel";
 import AuthForm from "../components/auth/AuthForm";
 import { useAuth } from "../context/AuthContext";
 
+const API_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+
 export default function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [apiError, setApiError] = useState("");
+  const [searchParams] = useSearchParams();
+  const googleError = searchParams.get("error");
+  const [apiError, setApiError] = useState(
+    googleError ? "Google sign in failed. Please try again." : ""
+  );
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_BASE}/api/auth/google`;
+  };
 
   const handleSubmit = async ({ email, password }) => {
     setApiError("");
@@ -40,7 +50,7 @@ export default function LoginPage() {
         </nav>
 
         <div className="flex-1 flex items-center justify-center">
-          <AuthForm variant="login" onSubmit={handleSubmit} apiError={apiError} loading={loading} />
+          <AuthForm variant="login" onSubmit={handleSubmit} apiError={apiError} loading={loading} onGoogleLogin={handleGoogleLogin} />
         </div>
 
         <footer className="pt-8 text-[10px] font-mono uppercase tracking-widest text-outline/40 text-center">

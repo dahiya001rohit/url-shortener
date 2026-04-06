@@ -3,7 +3,9 @@ import mongoose from "mongoose";
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
+  password: { type: String, required: false, default: null },
+  googleId: { type: String, default: null },
+  avatar: { type: String, default: null },
   bio: { type: String, default: "" },
   isDeleted: { type: Boolean, default: false },
   deletedAt: { type: Date, default: null },

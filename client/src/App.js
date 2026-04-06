@@ -11,6 +11,7 @@ import DemoAnalyticsPage from "./Pages/DemoAnalyticsPage";
 import HomePage from "./Pages/HomePage";
 import ProfilePage from "./Pages/ProfilePage";
 import SettingsPage from "./Pages/SettingsPage";
+import AuthCallbackPage from "./Pages/AuthCallbackPage";
 import "./index.css";
 import Footer from "./components/layout/Footer";
 import { useAuth } from "./context/AuthContext";
@@ -140,6 +141,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/demo" element={<DemoPage />} />
         <Route path="/demo/analytics/:shortCode" element={<DemoAnalyticsPage />} />
       </Routes>

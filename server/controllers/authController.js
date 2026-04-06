@@ -16,7 +16,7 @@ function setRefreshCookie(res, token) {
   res.cookie(REFRESH_COOKIE, token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }
@@ -43,6 +43,11 @@ export async function login(req, res, next) {
 
     const user = await User.findOne({ email });
     if (!user || user.isDeleted) return res.status(401).json({ message: "Invalid credentials" });
+
+    // Google-only accounts have no password
+    if (user.googleId && !user.password) {
+      return res.status(401).json({ message: "This account uses Google sign in" });
+    }
 
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: "Invalid credentials" });
