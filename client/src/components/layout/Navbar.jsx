@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Link2, User, LogOut, LayoutDashboard, Settings, Menu, X } from "lucide-react";
+import { Link2, User, LogOut, LayoutDashboard, Settings, Menu, X, Home } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
 const NAV_LINKS = [
@@ -69,6 +69,13 @@ export function Navbar() {
 
           {isLoggedIn ? (
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate("/home")}
+                className="hidden sm:flex items-center gap-2 text-emerald-800/70 text-sm font-medium hover:text-emerald-600 transition-colors"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </button>
               <button
                 onClick={() => navigate("/dashboard")}
                 className="hidden sm:flex items-center gap-2 text-emerald-800/70 text-sm font-medium hover:text-emerald-600 transition-colors"

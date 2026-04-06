@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+const BASE_URL = SERVER_BASE.replace(/^https?:\/\//, "");
 import { motion } from "framer-motion";
 import { BarChart3, LayoutDashboard } from "lucide-react";
 import Globe from "../ui/Globe";
@@ -81,7 +84,7 @@ export function FeaturesSection() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  {["snip.ly/arch-daily", "snip.ly/figma-23", "snip.ly/gpt-essay"].map((slug) => (
+                  {[`${BASE_URL}/arch-daily`, `${BASE_URL}/figma-23`, `${BASE_URL}/gpt-essay`].map((slug) => (
                     <div key={slug} className="h-10 bg-surface rounded flex items-center px-4 gap-3 border border-surface-container-high">
                       <div className="w-2 h-2 rounded-full bg-emerald-400" />
                       <span className="text-xs font-mono text-primary">{slug}</span>

@@ -1,3 +1,6 @@
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+const BASE_URL = SERVER_BASE.replace(/^https?:\/\//, "");
+
 export default function LinkDetails({ shortCode, createdAt, expiresAt, totalClicks }) {
   const formatted = (iso) => {
     if (!iso) return "—";
@@ -9,7 +12,7 @@ export default function LinkDetails({ shortCode, createdAt, expiresAt, totalClic
   };
 
   const cols = [
-    { label: "Short Code", value: `snip.ly/${shortCode}` },
+    { label: "Short Code", value: `${BASE_URL}/${shortCode}` },
     { label: "Created", value: formatted(createdAt) },
     { label: "Expires", value: expiresAt ? formatted(expiresAt) : "Never" },
     { label: "Total Clicks", value: totalClicks?.toLocaleString() ?? "—" },

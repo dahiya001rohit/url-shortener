@@ -1,4 +1,7 @@
 import { useNavigate } from "react-router-dom";
+
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+const BASE_URL = SERVER_BASE.replace(/^https?:\/\//, "");
 import { ArrowRight } from "lucide-react";
 
 export default function TopLinks({ links = [] }) {
@@ -39,7 +42,7 @@ export default function TopLinks({ links = [] }) {
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-mono text-sm text-primary truncate">
-                    snip.ly/{link.shortCode}
+                    {BASE_URL}/{link.shortCode}
                   </p>
                   <p className="text-xs font-body text-secondary truncate mt-0.5">
                     {link.originalUrl.replace(/^https?:\/\//, "")}

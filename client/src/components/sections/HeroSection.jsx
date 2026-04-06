@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+const BASE_URL = SERVER_BASE.replace(/^https?:\/\//, "");
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Link2, ArrowRight, Sparkles, Lock } from "lucide-react";
@@ -7,13 +10,13 @@ const PLACEHOLDERS = [
   "https://substack.com/my-newsletter-article",
   "https://youtube.com/watch?v=creators-journey",
   "https://behance.net/portfolio/creative-editorial",
-  "https://snip.ly/your-next-big-campaign",
+  `https://${BASE_URL}/your-next-big-campaign`,
 ];
 
 const MOCK_URLS = [
-  { icon: "🏛", slug: "snip.ly/arch-daily", original: "archdaily.com/98...", clicks: "1.2k", iconBg: "bg-[#b7ede8]" },
-  { icon: "✏️", slug: "snip.ly/figma-23", original: "figma.com/file/X9...", clicks: "843", iconBg: "bg-[#FFB95F]" },
-  { icon: "🎓", slug: "snip.ly/gpt-essay", original: "openai.com/blog/...", clicks: "2.1k", iconBg: "bg-[#e2dfde]" },
+  { icon: "🏛", slug: `${BASE_URL}/arch-daily`, original: "archdaily.com/98...", clicks: "1.2k", iconBg: "bg-[#b7ede8]" },
+  { icon: "✏️", slug: `${BASE_URL}/figma-23`, original: "figma.com/file/X9...", clicks: "843", iconBg: "bg-[#FFB95F]" },
+  { icon: "🎓", slug: `${BASE_URL}/gpt-essay`, original: "openai.com/blog/...", clicks: "2.1k", iconBg: "bg-[#e2dfde]" },
 ];
 
 const fadeUp = {
@@ -170,7 +173,7 @@ export function HeroSection() {
               </div>
               <div className="mx-auto bg-white rounded px-4 py-1 text-[10px] text-outline font-mono flex items-center gap-2">
                 <Lock className="w-3 h-3" />
-                snip.ly/dashboard
+                {BASE_URL}/dashboard
               </div>
             </div>
             {/* Dashboard */}

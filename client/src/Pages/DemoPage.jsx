@@ -1,4 +1,7 @@
 import { useState, useMemo } from "react";
+
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+const BASE_URL = SERVER_BASE.replace(/^https?:\/\//, "");
 import { useNavigate, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -139,7 +142,7 @@ function DemoTableRow({ link, onDelete, onToast }) {
   const statusVariant = getStatus(link);
 
   function handleCopy() {
-    navigator.clipboard.writeText(`https://snip.ly/${link.shortCode}`).catch(() => {});
+    navigator.clipboard.writeText(`${SERVER_BASE}/${link.shortCode}`).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
@@ -158,7 +161,7 @@ function DemoTableRow({ link, onDelete, onToast }) {
   return (
     <tr className="border-b border-outline-variant/20 hover:bg-surface-container-low/50 transition-colors group">
       <td className="py-3.5 pl-4 pr-3">
-        <span className="font-mono text-sm text-primary">snip.ly/{link.shortCode}</span>
+        <span className="font-mono text-sm text-primary">{BASE_URL}/{link.shortCode}</span>
       </td>
       <td className="py-3.5 px-3 max-w-xs">
         <span className="text-sm text-secondary truncate block" title={link.originalUrl}>

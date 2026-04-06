@@ -1,4 +1,7 @@
 import { useNavigate } from "react-router-dom";
+
+const SERVER_BASE = (process.env.REACT_APP_API_URL || "http://localhost:5010/api").replace(/\/api$/, "");
+const BASE_URL = SERVER_BASE.replace(/^https?:\/\//, "");
 import { ArrowLeft } from "lucide-react";
 import Badge from "../shared/ui/Badge";
 import Button from "../shared/ui/Button";
@@ -24,7 +27,7 @@ export default function AnalyticsHeader({ shortCode, originalUrl, status, dateRa
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl font-headline italic text-foreground">
-              snip.ly/{shortCode}
+              {BASE_URL}/{shortCode}
             </h1>
             <Badge variant={status === "Active" ? "active" : "expired"}>
               {status}
