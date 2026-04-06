@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
 import api from "services/api";
+
+const REFRESH_URL = `${process.env.REACT_APP_API_URL || "http://localhost:5010/api"}/auth/refresh`;
 
 const AuthContext = createContext(null);
 
@@ -28,21 +31,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (accessToken) {
-      api.get("/user/profile")
-        .then(({ data }) => {
-          setUser(data);
-          applyPreferences(data.preferences);
-        })
-        .catch((err) => {
-          console.error("[AuthContext] profile fetch failed:", err?.response?.status, err?.message);
+    if (!accessToken) { setLoading(false); return; }
+
+    api.get("/user/profile")
+      .then(({ data }) => {
+        setUser(data);
+        applyPreferences(data.preferences);
+      })
+      .catch(async () => {
+        // Access token expired — try refresh via cookie
+        try {
+          const { data: refreshData } = await axios.get(REFRESH_URL, { withCredentials: true });
+          localStorage.setItem("accessToken", refreshData.accessToken);
+          setAccessToken(refreshData.accessToken);
+          const { data: profile } = await api.get("/user/profile");
+          setUser(profile);
+          applyPreferences(profile.preferences);
+        } catch {
           localStorage.removeItem("accessToken");
           setAccessToken(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
+        }
+      })
+      .finally(() => setLoading(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const login = async (email, password) => {

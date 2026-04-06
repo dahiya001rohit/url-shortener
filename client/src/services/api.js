@@ -20,9 +20,8 @@ api.interceptors.response.use(
     if (err.response?.status === 401 && !original._retry) {
       original._retry = true;
       try {
-        const { data } = await axios.post(
+        const { data } = await axios.get(
           `${process.env.REACT_APP_API_URL || "http://localhost:5010/api"}/auth/refresh`,
-          {},
           { withCredentials: true }
         );
         localStorage.setItem("accessToken", data.accessToken);
@@ -30,7 +29,9 @@ api.interceptors.response.use(
         return api(original);
       } catch {
         localStorage.removeItem("accessToken");
-        window.location.href = "/login";
+        if (!window.location.pathname.includes("/login")) {
+          window.location.href = "/login";
+        }
       }
     }
     return Promise.reject(err);

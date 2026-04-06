@@ -29,9 +29,10 @@ app.use(compression());
 app.use(globalLimiter);
 const ALLOWED_ORIGINS = [
   /^http:\/\/localhost(:\d+)?$/,
+  process.env.CLIENT_URL,
   "http://url-shortener-1-elnl.onrender.com",
   "https://url-shortener-1-elnl.onrender.com",
-];
+].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -42,7 +43,11 @@ app.use(cors({
     allowed ? callback(null, true) : callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
 }));
+
+app.options("*", cors());
 app.use(express.json());
 app.use(cookieParser());
 

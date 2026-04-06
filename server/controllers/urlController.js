@@ -71,62 +71,157 @@ export async function shortenUrl(req, res, next) {
   }
 }
 
+const APP_DOMAINS = [
+  "youtube.com", "youtu.be",
+  "instagram.com",
+  "twitter.com", "x.com",
+  "tiktok.com",
+  "spotify.com",
+  "facebook.com",
+  "linkedin.com",
+  "snapchat.com",
+  "reddit.com",
+  "whatsapp.com",
+];
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function serveRedirectPage(res, originalUrl, status = 200) {
+  const safeUrl = escapeHtml(originalUrl);
+  const clientUrl = process.env.CLIENT_URL || "";
+  return res.status(status).send(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Redirecting... — Snip</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0;url=${safeUrl}">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Inter, -apple-system, sans-serif; background: #FAF9F8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .card { background: white; border: 1px solid #BFC8C7; border-radius: 1rem; padding: 2rem; text-align: center; max-width: 360px; width: 100%; box-shadow: 0 4px 24px rgba(0,47,45,0.08); }
+    .logo { font-size: 1.25rem; font-weight: 900; color: #002F2D; margin-bottom: 1.5rem; font-style: italic; }
+    .spinner { width: 36px; height: 36px; border: 3px solid #E3E2E1; border-top-color: #002F2D; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1.25rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h2 { font-size: 1rem; color: #1A1C1C; margin-bottom: 0.5rem; }
+    .url { font-family: monospace; font-size: 0.75rem; color: #707978; word-break: break-all; margin-bottom: 1.25rem; background: #F4F3F2; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+    .btn { display: inline-block; background: #002F2D; color: white; padding: 0.625rem 1.25rem; border-radius: 999px; font-size: 0.8125rem; font-weight: 700; text-decoration: none; margin-bottom: 0.75rem; }
+    .skip { display: block; font-size: 0.75rem; color: #707978; text-decoration: none; margin-top: 0.5rem; }
+    .snip-badge { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #E3E2E1; font-size: 0.7rem; color: #BFC8C7; font-family: monospace; }
+    .snip-badge a { color: #002F2D; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">Snip.</div>
+    <div class="spinner"></div>
+    <h2>Taking you there...</h2>
+    <div class="url">${safeUrl}</div>
+    <a href="${safeUrl}" class="btn">Open Link →</a>
+    <a href="${safeUrl}" class="skip">Tap here if not redirected</a>
+    <div class="snip-badge">Shortened with <a href="${escapeHtml(clientUrl)}">Snip</a></div>
+  </div>
+  <script>
+    var dest = ${JSON.stringify(originalUrl)};
+    setTimeout(function() { window.location.href = dest; }, 800);
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) { clearTimeout(); }
+    });
+  </script>
+</body>
+</html>`);
+}
+
+function serve404(res) {
+  const clientUrl = process.env.CLIENT_URL || "";
+  return res.status(404).send(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Link Not Found — Snip</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Inter, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #FAF9F8; color: #1A1C1C; }
+    .card { text-align: center; padding: 2rem; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    p { color: #5F5E5E; font-size: 0.875rem; }
+    a { display: inline-block; margin-top: 1rem; color: #002F2D; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Link Not Found</h1>
+    <p>This short link does not exist or has been deleted.</p>
+    <a href="${escapeHtml(clientUrl)}">Go to Snip →</a>
+  </div>
+</body>
+</html>`);
+}
+
+function serve410(res) {
+  const clientUrl = process.env.CLIENT_URL || "";
+  return res.status(410).send(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Link Expired — Snip</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Inter, sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #FAF9F8; }
+    .card { text-align: center; padding: 2rem; }
+    h1 { font-size: 1.5rem; color: #BA1A1A; }
+    p { color: #5F5E5E; font-size: 0.875rem; }
+    a { display: inline-block; margin-top: 1rem; color: #002F2D; font-size: 0.875rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Link Expired</h1>
+    <p>This short link has expired and is no longer active.</p>
+    <a href="${escapeHtml(clientUrl)}">Go to Snip →</a>
+  </div>
+</body>
+</html>`);
+}
+
 export async function redirectUrl(req, res, next) {
   const { shortCode } = req.params;
 
   try {
+    let originalUrl, urlId, expiresAt, userId;
+
     const cached = await redisClient.get(`url:${shortCode}`);
-
     if (cached) {
-      const { urlId, originalUrl, expiresAt, userId } = JSON.parse(cached);
-      if (expiresAt && new Date(expiresAt) < new Date())
-        return res.status(410).json({ message: "This link has expired" });
+      ({ originalUrl, urlId, expiresAt, userId } = JSON.parse(cached));
+    } else {
+      const url = await Url.findOne({ shortCode });
+      if (!url) return serve404(res);
 
-      res.redirect(originalUrl);
+      originalUrl = url.originalUrl;
+      urlId = url._id.toString();
+      expiresAt = url.expiresAt;
+      userId = url.userId?.toString();
 
-      // Check owner's privacy preference
-      User.findById(userId).select("preferences").then((owner) => {
-        const allowTracking = owner?.preferences?.privacy?.allowAnonymousTracking !== false;
-        if (allowTracking) {
-          analyticsQueue.add("click", {
-            urlId,
-            shortCode,
-            ip: req.ip,
-            userAgent: req.headers["user-agent"],
-            referrer: req.headers["referer"] || "Direct",
-          }).catch((err) => console.error("Queue error:", err));
-        }
-      }).catch(() => {});
-
-      return;
+      redisClient.set(
+        `url:${shortCode}`,
+        JSON.stringify({ urlId, originalUrl, expiresAt, userId }),
+        "EX",
+        3600
+      ).catch((err) => console.error("Cache set error:", err));
     }
 
-    const url = await Url.findOne({ shortCode });
-    if (!url) return res.status(404).json({ message: "Short URL not found" });
-    if (url.expiresAt && url.expiresAt < new Date())
-      return res.status(410).json({ message: "This link has expired" });
+    if (expiresAt && new Date(expiresAt) < new Date()) return serve410(res);
 
-    res.redirect(url.originalUrl);
-
-    // Fire-and-forget: cache
-    redisClient.set(
-      `url:${shortCode}`,
-      JSON.stringify({
-        urlId: url._id.toString(),
-        originalUrl: url.originalUrl,
-        expiresAt: url.expiresAt,
-        userId: url.userId?.toString(),
-      }),
-      "EX",
-      3600
-    ).catch((err) => console.error("Cache set error:", err));
-
-    // Check owner's privacy preference then queue
-    User.findById(url.userId).select("preferences").then((owner) => {
+    // Fire-and-forget analytics with privacy gate
+    User.findById(userId).select("preferences").then((owner) => {
       const allowTracking = owner?.preferences?.privacy?.allowAnonymousTracking !== false;
       if (allowTracking) {
         analyticsQueue.add("click", {
-          urlId: url._id.toString(),
+          urlId,
           shortCode,
           ip: req.ip,
           userAgent: req.headers["user-agent"],
@@ -134,6 +229,14 @@ export async function redirectUrl(req, res, next) {
         }).catch((err) => console.error("Queue error:", err));
       }
     }).catch(() => {});
+
+    const ua = req.headers["user-agent"] || "";
+    const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
+    const isAppUrl = APP_DOMAINS.some((domain) => originalUrl.includes(domain));
+
+    if (isMobile && isAppUrl) return serveRedirectPage(res, originalUrl);
+
+    return res.redirect(originalUrl);
 
   } catch (err) {
     next(err);
