@@ -74,10 +74,20 @@ app.use("/api/health", healthRouter);
 app.get("/api/activity/recent", authenticate, getRecentActivity);
 app.get("/:shortCode", redirectUrl);
 
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+
 app.use(errorHandler);
 
 connectDB()
   .then(() => {
+    setInterval(() => {
+      fetch(`${env.SERVER_URL || 'http://localhost:4000'}/api/health`)
+        .catch(() => {}); // silent catch
+    }, 10 * 60 * 1000);
+    console.log(`[health] Scheduled self-ping to ${env.SERVER_URL || 'http://localhost:4000'}/api/health every 10m`);
     app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
   })
   .catch((err) => {
